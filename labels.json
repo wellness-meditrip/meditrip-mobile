@@ -1,0 +1,77 @@
+[
+  {
+    "name": "⚙ Setting",
+    "color": "e3dede",
+    "description": "개발 환경"
+  },
+  {
+    "name": "✨ Feat",
+    "color": "a2eeef",
+    "description": "기능 개발"
+  },
+  {
+    "name": "🌏 Deploy",
+    "color": "C2E0C6",
+    "description": "배포 관련"
+  },
+  {
+    "name": "🎨 Style",
+    "color": "FEF2C0",
+    "description": "코드 스타일 수정"
+  },
+  {
+    "name": "🐞 Fix",
+    "color": "d73a4a",
+    "description": "Something isn't working"
+  },
+  {
+    "name": "💻 Struct",
+    "color": "C5DEF5",
+    "description": "폴더 구조 변경"
+  },
+  {
+    "name": "📃 Docs",
+    "color": "1D76DB",
+    "description": "문서 작성 및 수정 (README.md 등)"
+  },
+  {
+    "name": "📬 Chore",
+    "color": "D4C5F9",
+    "description": "빌드, 패키지 매니저/코드 수정"
+  },
+  {
+    "name": "🔨 Refactor",
+    "color": "f29a4e",
+    "description": "리팩토링"
+  },
+  {
+    "name": "🙋‍♂️ Question",
+    "color": "9ED447",
+    "description": "Further information is requested"
+  },
+  {
+    "name": "🥰 SEO",
+    "color": "facfcf",
+    "description": "웹 접근성"
+  },
+  {
+    "name": "✅ Test",
+    "color": "ccffc4",
+    "description": "test (storybook, jest...)"
+  },
+  {
+    "name": "Todo",
+    "color": "3525CF",
+    "description": "작업 예정"
+  },
+  {
+    "name": "Done",
+    "color": "c2e0c6",
+    "description": "작업 완료"
+  },
+  {
+    "name": "InProgress",
+    "color": "569815",
+    "description": "작업중"
+  }
+]
