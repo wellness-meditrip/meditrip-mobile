@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 import Text from './text';
 import { ScaledStyleProps, applyScaledStyles } from './types';
 import Button from './button';
@@ -109,20 +103,15 @@ const styles = StyleSheet.create({
   base: {
     flex: 1,
     fontSize: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     color: '#1A1A1A',
     minHeight: 48,
     textAlignVertical: 'center',
   },
   outlined: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
   },
   filled: {
-    backgroundColor: '#F2F2F7',
-    borderWidth: 0,
+    backgroundColor: 'fff',
   },
   focused: {
     borderColor: '#007AFF',

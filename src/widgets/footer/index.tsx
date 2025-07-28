@@ -4,31 +4,34 @@ import { Text, View } from '@/src/shared/ui/custom';
 import Gap from '@/src/shared/ui/gap';
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { BoxLayout } from '../../shared/ui/box-layout';
 
 const Footer = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <INSTAGRAM />
-          <TWITTER />
-          <YOUTUBE />
-        </View>
-        <Gap size={10} />
-        <View>
-          <Text fontSize={12} color='#666' weight='bold'>
-            MEDITRIP
+    <BoxLayout>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.iconContainer}>
+            <TWITTER />
+            <INSTAGRAM />
+            <YOUTUBE />
+          </View>
+          <Gap size={10} />
+          <View>
+            <Text fontSize={12} color='#666' weight='bold'>
+              MEDITRIP
+            </Text>
+          </View>
+          <Gap size={10} />
+          <Text fontSize={12} color='#666'>
+            Pravacy
+          </Text>
+          <Text fontSize={12} color='#666'>
+            Terms of Service
           </Text>
         </View>
-        <Gap size={10} />
-        <Text fontSize={12} color='#666'>
-          Pravacy
-        </Text>
-        <Text fontSize={12} color='#666'>
-          Terms of Service
-        </Text>
       </View>
-    </View>
+    </BoxLayout>
   );
 };
 
