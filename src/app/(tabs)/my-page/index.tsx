@@ -73,16 +73,18 @@ const ProfileSection = () => (
           style={styles.profileImage}
         />
         <View style={styles.profileText}>
-          <Text style={styles.userName}>Elena Duran</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.userName}>Elena Duran</Text>
+          </View>
           <View style={styles.countryInfo}>
             <View style={styles.japanFlag} />
             <Text style={styles.countryText}>Japan</Text>
           </View>
         </View>
+        <TouchableOpacity style={styles.editButton}>
+          <Text style={styles.editIcon}>⚙️</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.editIcon}>✏️</Text>
-      </TouchableOpacity>
     </View>
   </BoxLayout>
 );
@@ -190,10 +192,15 @@ const styles = StyleSheet.create({
   profileText: {
     flex: 1,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 4,
   },
   countryInfo: {
     flexDirection: 'row',
@@ -214,7 +221,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   editIcon: {
-    fontSize: 16,
+    fontSize: 14,
   },
 
   // 섹션 헤더 스타일
