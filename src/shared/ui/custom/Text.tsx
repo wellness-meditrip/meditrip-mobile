@@ -17,10 +17,30 @@ export const Text: React.FC<TextProps> = ({
   children,
   ...props
 }) => {
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'h1': return styles.h1;
+      case 'h2': return styles.h2;
+      case 'h3': return styles.h3;
+      case 'caption': return styles.caption;
+      case 'label': return styles.label;
+      default: return styles.body;
+    }
+  };
+
+  const getWeightStyle = () => {
+    switch (weight) {
+      case 'medium': return styles.medium;
+      case 'semibold': return styles.semibold;
+      case 'bold': return styles.bold;
+      default: return styles.normal;
+    }
+  };
+
   const textStyle = [
     styles.base,
-    styles[variant],
-    styles[weight],
+    getVariantStyle(),
+    getWeightStyle(),
     { textAlign: align },
     color && { color },
     style,

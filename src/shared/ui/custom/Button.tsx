@@ -16,7 +16,7 @@ export interface ButtonProps extends PressableProps {
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
+  variant = 'ghost',
   size = 'medium',
   loading = false,
   disabled = false,
@@ -26,13 +26,30 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const textColor = getTextColor(variant, disabled);
 
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'primary': return styles.primary;
+      case 'secondary': return styles.secondary;
+      case 'outline': return styles.outline;
+      default: return styles.ghost;
+    }
+  };
+
+  const getSizeStyle = () => {
+    switch (size) {
+      case 'small': return styles.small;
+      case 'large': return styles.large;
+      default: return styles.medium;
+    }
+  };
+
   return (
     <Pressable
       style={({ pressed }) => {
         const buttonStyles: any[] = [
           styles.base,
-          styles[variant],
-          styles[size],
+          getVariantStyle(),
+          getSizeStyle(),
         ];
         
         if (disabled) buttonStyles.push(styles.disabled);
@@ -72,7 +89,7 @@ const getTextColor = (variant: string, disabled: boolean): string => {
     case 'outline':
       return '#007AFF';
     case 'ghost':
-      return '#007AFF';
+      return '#333333';
     default:
       return '#FFFFFF';
   }
@@ -101,19 +118,19 @@ const styles = StyleSheet.create({
   },
   // Sizes
   small: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minHeight: 32,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    minHeight: 0,
   },
   medium: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    minHeight: 44,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    minHeight: 0,
   },
   large: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    minHeight: 56,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    minHeight: 0,
   },
   // States
   disabled: {
