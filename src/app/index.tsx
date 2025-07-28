@@ -5,6 +5,6 @@ export default function Index() {
   useEffect(() => {
     router.replace('/(tabs)/home');
   }, []);
-  
+
   return null;
-} 
+}

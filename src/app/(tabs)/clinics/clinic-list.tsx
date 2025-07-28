@@ -1,5 +1,11 @@
-import React from 'react'
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const mockClinics = [
   { id: '1', name: '서울대학교병원', location: '서울시 종로구', rating: 4.8 },
@@ -7,7 +13,7 @@ const mockClinics = [
   { id: '3', name: '고려대학교병원', location: '서울시 성북구', rating: 4.6 },
   { id: '4', name: '삼성서울병원', location: '서울시 강남구', rating: 4.9 },
   { id: '5', name: '아산병원', location: '서울시 송파구', rating: 4.5 },
-]
+];
 
 const ClinicList = () => {
   const renderClinic = ({ item }: { item: any }) => (
@@ -20,7 +26,7 @@ const ClinicList = () => {
         <Text style={styles.rating}>⭐ {item.rating}</Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <View style={styles.container}>
@@ -28,14 +34,14 @@ const ClinicList = () => {
       <FlatList
         data={mockClinics}
         renderItem={renderClinic}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         style={styles.list}
       />
     </View>
-  )
-}
+  );
+};
 
-export default ClinicList
+export default ClinicList;
 
 const styles = StyleSheet.create({
   container: {
@@ -89,4 +95,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FF6B35',
   },
-})
+});

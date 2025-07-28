@@ -1,13 +1,9 @@
-import { Button } from './Button';
-import { Input } from './Input';
-import { Text } from './Text';
+// 각 컴포넌트들을 import
+import Button from './button';
+import Input from './input';
+import ScrollView from './scroll-view';
+import Text from './text';
+import View from './view';
 
-export { Button, type ButtonProps } from './Button';
-export { Input, type InputProps } from './Input';
-export { Text, type TextProps } from './Text';
-
-export const Custom = {
-  Button,
-  Input,
-  Text,
-};
+// 각 컴포넌트들을 export
+export { Button, Input, ScrollView, Text, View };

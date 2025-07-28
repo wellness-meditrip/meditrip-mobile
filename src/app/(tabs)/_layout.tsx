@@ -14,7 +14,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="home"
+      initialRouteName='home'
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: true,
@@ -28,12 +28,15 @@ export default function TabLayout() {
           },
           default: {},
         }),
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="home"
+        name='home'
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='house.fill' color={color} />
+          ),
         }}
       />
       {/* <Tabs.Screen
@@ -44,17 +47,21 @@ export default function TabLayout() {
         }}
       /> */}
       <Tabs.Screen
-        name="clinics"
+        name='clinics'
         options={{
           title: 'Clinics',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='paperplane.fill' color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="my-page"
+        name='my-page'
         options={{
           title: 'My Page',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name='person.fill' color={color} />
+          ),
         }}
       />
     </Tabs>

@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 const Profile = () => {
   return (
@@ -13,7 +13,7 @@ const Profile = () => {
         <Text style={styles.name}>사용자 이름</Text>
         <Text style={styles.email}>user@example.com</Text>
       </View>
-      
+
       <View style={styles.infoSection}>
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>전화번호</Text>
@@ -29,10 +29,10 @@ const Profile = () => {
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-}) 
+});

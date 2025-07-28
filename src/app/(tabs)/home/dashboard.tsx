@@ -1,5 +1,5 @@
-import React from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const Dashboard = () => {
   return (
@@ -7,31 +7,31 @@ const Dashboard = () => {
       <View style={styles.header}>
         <Text style={styles.title}>대시보드</Text>
       </View>
-      
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>오늘의 예약</Text>
         <Text style={styles.cardContent}>예약된 일정이 없습니다.</Text>
       </View>
-      
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>최근 방문</Text>
         <Text style={styles.cardContent}>서울대학교병원 - 2024년 1월 15일</Text>
       </View>
-      
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>건강 상태</Text>
         <Text style={styles.cardContent}>양호</Text>
       </View>
-      
+
       <View style={styles.card}>
         <Text style={styles.cardTitle}>다음 예약</Text>
         <Text style={styles.cardContent}>예정된 예약이 없습니다.</Text>
       </View>
     </ScrollView>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
 
 const styles = StyleSheet.create({
   container: {
@@ -73,4 +73,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-}) 
+});

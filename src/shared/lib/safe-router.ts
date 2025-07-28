@@ -53,4 +53,4 @@ export const useSafeRouter = (): SafeRouterHandler => {
       return true;
     },
   };
-}; 
+};

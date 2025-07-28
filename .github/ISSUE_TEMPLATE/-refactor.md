@@ -1,9 +1,9 @@
 ---
-name: "♻️ REFACTOR"
+name: '♻️ REFACTOR'
 about: 리팩토링 템플릿
-title: "refactor: 제목 작성"
-labels: "Refactor, InProgress"
-assignees: "lumpenop"
+title: 'refactor: 제목 작성'
+labels: 'Refactor, InProgress'
+assignees: 'lumpenop'
 ---
 
 <!--
@@ -29,4 +29,4 @@ assignees: "lumpenop"
 
 ## 기타
 
-<!-- 필요한 경우 작성, 작업 과정에서 추가로 발견, 생성된 이슈의 경우, 해당 이슈의 게시물을 번호와 함께 연결해 주세요. --> 
+<!-- 필요한 경우 작성, 작업 과정에서 추가로 발견, 생성된 이슈의 경우, 해당 이슈의 게시물을 번호와 함께 연결해 주세요. -->

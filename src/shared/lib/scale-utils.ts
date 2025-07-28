@@ -15,13 +15,13 @@ export const scale = (size: number): number => {
   const widthScale = SCREEN_WIDTH / DESIGN_WIDTH;
   const heightScale = SCREEN_HEIGHT / DESIGN_HEIGHT;
   const scale = Math.min(widthScale, heightScale);
-  
+
   const newSize = size * scale;
-  
+
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
   }
-  
+
   return Math.round(newSize);
 };
 
@@ -33,16 +33,16 @@ export const scale = (size: number): number => {
 export const verticalScale = (size: number): number => {
   const scale = SCREEN_HEIGHT / DESIGN_HEIGHT;
   const newSize = size * scale;
-  
+
   // 폰트는 최소/최대 크기 제한
   const minSize = 8;
   const maxSize = 32;
-  
+
   const finalSize = Math.max(minSize, Math.min(maxSize, newSize));
-  
+
   if (Platform.OS === 'ios') {
     return Math.round(PixelRatio.roundToNearestPixel(finalSize));
   }
-  
+
   return Math.round(finalSize);
-}; 
+};

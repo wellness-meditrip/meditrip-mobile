@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Text } from './Text';
+import Text from './text';
+import { ScaledStyleProps, applyScaledStyles } from './types';
+import Button from './button';
 
-export interface InputProps extends Omit<TextInputProps, 'style'> {
+interface InputProps extends Omit<TextInputProps, 'style'>, ScaledStyleProps {
   label?: string;
   error?: string;
   helper?: string;
@@ -22,7 +24,7 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
   style?: any;
 }
 
-export const Input: React.FC<InputProps> = ({
+const Input: React.FC<InputProps> = ({
   label,
   error,
   helper,
@@ -33,55 +35,58 @@ export const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
 
   const inputStyle = [
     styles.base,
     styles[variant],
-    isFocused ? styles.focused : null,
+
     error ? styles.error : null,
     leftIcon ? styles.withLeftIcon : null,
     rightIcon ? styles.withRightIcon : null,
+    scaledStyle,
     style,
   ];
 
   return (
-    <View style={styles.container}>
+    <View>
       {label && (
-        <Text variant="label" weight="medium" style={styles.label}>
+        <Text variant='label' weight='medium' style={styles.label}>
           {label}
         </Text>
       )}
-      
+
       <View style={styles.inputContainer}>
-        {leftIcon && (
-          <View style={styles.leftIcon}>
-            {leftIcon}
-          </View>
-        )}
-        
+        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+
         <TextInput
           style={inputStyle}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholderTextColor="#8E8E93"
+          placeholderTextColor='#8E8E93'
           {...props}
         />
-        
+
         {rightIcon && (
-          <TouchableOpacity
-            style={styles.rightIcon}
+          <Button
+            style={[
+              styles.rightIcon,
+              props.value && props.value.length > 0
+                ? styles.rightIconEnabled
+                : styles.rightIconDisabled,
+            ]}
             onPress={onRightIconPress}
-            disabled={!onRightIconPress}
+            disabled={
+              !props.value || props.value.length === 0 || !onRightIconPress
+            }
           >
             {rightIcon}
-          </TouchableOpacity>
+          </Button>
         )}
       </View>
-      
+
       {(error || helper) && (
         <Text
-          variant="caption"
+          variant='caption'
           color={error ? '#FF3B30' : '#666666'}
           style={styles.helper}
         >
@@ -93,9 +98,6 @@ export const Input: React.FC<InputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
   label: {
     marginBottom: 8,
     color: '#333333',
@@ -109,8 +111,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 8,
     color: '#1A1A1A',
+    minHeight: 48,
+    textAlignVertical: 'center',
   },
   outlined: {
     borderWidth: 1,
@@ -143,7 +146,15 @@ const styles = StyleSheet.create({
     right: 16,
     zIndex: 1,
   },
+  rightIconEnabled: {
+    opacity: 1,
+  },
+  rightIconDisabled: {
+    opacity: 0.3,
+  },
   helper: {
     marginTop: 4,
   },
-}); 
+});
+
+export default Input;

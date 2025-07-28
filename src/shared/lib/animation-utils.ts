@@ -151,10 +151,11 @@ export const useSpringScale = (
     );
 
     // 스프링 효과를 위한 추가 변형
-    const springScale = scale * (1 + Math.sin(animatedValue.value * 0.1) * 0.05);
+    const springScale =
+      scale * (1 + Math.sin(animatedValue.value * 0.1) * 0.05);
 
     return {
       transform: [{ scale: springScale }],
     };
   });
-}; 
+};

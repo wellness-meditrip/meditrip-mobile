@@ -1,9 +1,9 @@
 ---
-name: "✨ FEATURE"
+name: '✨ FEATURE'
 about: 작업 사항 기록 템플릿
-title: "feat: 제목 작성"
-labels: "Feat, InProgress"
-assignees: "lumpenop"
+title: 'feat: 제목 작성'
+labels: 'Feat, InProgress'
+assignees: 'lumpenop'
 ---
 
 <!--

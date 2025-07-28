@@ -1,14 +1,19 @@
 import React from 'react';
-import { Text as RNText, TextProps as RNTextProps, StyleSheet } from 'react-native';
+import {
+  Text as RNText,
+  TextProps as RNTextProps,
+  StyleSheet,
+} from 'react-native';
+import { ScaledStyleProps, applyScaledStyles } from './types';
 
-export interface TextProps extends RNTextProps {
+interface TextProps extends RNTextProps, ScaledStyleProps {
   variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
   color?: string;
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
 }
 
-export const Text: React.FC<TextProps> = ({
+const Text: React.FC<TextProps> = ({
   variant = 'body',
   color = '#333',
   weight = 'normal',
@@ -19,23 +24,36 @@ export const Text: React.FC<TextProps> = ({
 }) => {
   const getVariantStyle = () => {
     switch (variant) {
-      case 'h1': return styles.h1;
-      case 'h2': return styles.h2;
-      case 'h3': return styles.h3;
-      case 'caption': return styles.caption;
-      case 'label': return styles.label;
-      default: return styles.body;
+      case 'h1':
+        return styles.h1;
+      case 'h2':
+        return styles.h2;
+      case 'h3':
+        return styles.h3;
+      case 'caption':
+        return styles.caption;
+      case 'label':
+        return styles.label;
+      default:
+        return styles.body;
     }
   };
 
   const getWeightStyle = () => {
     switch (weight) {
-      case 'medium': return styles.medium;
-      case 'semibold': return styles.semibold;
-      case 'bold': return styles.bold;
-      default: return styles.normal;
+      case 'medium':
+        return styles.medium;
+      case 'semibold':
+        return styles.semibold;
+      case 'bold':
+        return styles.bold;
+      default:
+        return styles.normal;
     }
   };
+
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
 
   const textStyle = [
     styles.base,
@@ -43,6 +61,7 @@ export const Text: React.FC<TextProps> = ({
     getWeightStyle(),
     { textAlign: align },
     color && { color },
+    scaledStyle,
     style,
   ];
 
@@ -95,4 +114,6 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: '700',
   },
-}); 
+});
+
+export default Text;

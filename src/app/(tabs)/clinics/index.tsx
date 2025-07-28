@@ -1,22 +1,22 @@
-import { router } from 'expo-router'
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { router } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Clinics = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Clinics</Text>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.button}
         onPress={() => router.push('/clinics/clinic-list')}
       >
         <Text style={styles.buttonText}>클리닉 리스트 보기</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default Clinics
+export default Clinics;
 
 const styles = StyleSheet.create({
   container: {
@@ -41,4 +41,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-}) 
+});

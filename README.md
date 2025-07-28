@@ -19,7 +19,7 @@ import { Icon } from '@/components/icons';
 
 // 사용 가능한 아이콘들
 // - arrow-left: 왼쪽 화살표
-// - search: 검색 아이콘  
+// - search: 검색 아이콘
 // - self: 사용자 아이콘
 ```
 

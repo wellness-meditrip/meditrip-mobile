@@ -1,22 +1,22 @@
-import { router } from 'expo-router'
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { router } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const MyPage = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Page</Text>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.button}
         onPress={() => router.push('/my-page/profile')}
       >
         <Text style={styles.buttonText}>프로필 보기</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default MyPage
+export default MyPage;
 
 const styles = StyleSheet.create({
   container: {
@@ -41,4 +41,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-})
+});

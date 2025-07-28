@@ -5,9 +5,10 @@ import {
   PressableProps,
   StyleSheet,
 } from 'react-native';
-import { Text } from './Text';
+import Text from './text';
+import { ScaledStyleProps, applyScaledStyles } from './types';
 
-export interface ButtonProps extends PressableProps {
+interface ButtonProps extends PressableProps, ScaledStyleProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
@@ -15,7 +16,7 @@ export interface ButtonProps extends PressableProps {
   children: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps> = ({
   variant = 'ghost',
   size = 'medium',
   loading = false,
@@ -28,20 +29,30 @@ export const Button: React.FC<ButtonProps> = ({
 
   const getVariantStyle = () => {
     switch (variant) {
-      case 'primary': return styles.primary;
-      case 'secondary': return styles.secondary;
-      case 'outline': return styles.outline;
-      default: return styles.ghost;
+      case 'primary':
+        return styles.primary;
+      case 'secondary':
+        return styles.secondary;
+      case 'outline':
+        return styles.outline;
+      default:
+        return styles.ghost;
     }
   };
 
   const getSizeStyle = () => {
     switch (size) {
-      case 'small': return styles.small;
-      case 'large': return styles.large;
-      default: return styles.medium;
+      case 'small':
+        return styles.small;
+      case 'large':
+        return styles.large;
+      default:
+        return styles.medium;
     }
   };
+
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
 
   return (
     <Pressable
@@ -50,12 +61,13 @@ export const Button: React.FC<ButtonProps> = ({
           styles.base,
           getVariantStyle(),
           getSizeStyle(),
+          scaledStyle,
         ];
-        
+
         if (disabled) buttonStyles.push(styles.disabled);
         if (pressed) buttonStyles.push(styles.pressed);
         if (style) buttonStyles.push(style);
-        
+
         return buttonStyles;
       }}
       disabled={disabled || loading}
@@ -63,13 +75,14 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={textColor} size="small" />
+        <ActivityIndicator color={textColor} size='small' />
       ) : (
         <Text
-          variant="body"
-          weight="semibold"
+          variant='body'
+          weight='semibold'
           color={textColor}
-          align="center"
+          align='center'
+          fontSize={props.fontSize}
         >
           {children}
         </Text>
@@ -80,7 +93,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 const getTextColor = (variant: string, disabled: boolean): string => {
   if (disabled) return '#999999';
-  
+
   switch (variant) {
     case 'primary':
       return '#FFFFFF';
@@ -139,4 +152,6 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.8,
   },
-}); 
+});
+
+export default Button;

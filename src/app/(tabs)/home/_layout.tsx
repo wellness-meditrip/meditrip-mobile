@@ -2,24 +2,23 @@ import { Stack } from 'expo-router';
 
 export default function HomeLayout() {
   return (
-    <Stack initialRouteName="index"
-    screenOptions={{
-      headerShown: false,
-      
-    }}
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
     >
       <Stack.Screen
-        name="index"
+        name='index'
         options={{
-          title: "Home",
+          title: '홈',
         }}
       />
       <Stack.Screen
-        name="dashboard"
+        name='dashboard'
         options={{
-          title: "대시보드",
+          title: '대시보드',
         }}
       />
     </Stack>
   );
-} 
+}
