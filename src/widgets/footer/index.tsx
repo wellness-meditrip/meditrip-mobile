@@ -1,7 +1,6 @@
 import { INSTAGRAM, TWITTER, YOUTUBE } from '@/assets/icons/components/footer';
 import { scale } from '@/src/shared/lib';
 import { Text, View } from '@/src/shared/ui/custom';
-import Gap from '@/src/shared/ui/gap';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { BoxLayout } from '../../shared/ui/box-layout';
@@ -16,13 +15,13 @@ const Footer = () => {
             <INSTAGRAM />
             <YOUTUBE />
           </View>
-          <Gap size={10} />
+          <View style={{ height: 10 }} />
           <View>
             <Text fontSize={12} color='#666' weight='bold'>
               MEDITRIP
             </Text>
           </View>
-          <Gap size={10} />
+          <View style={{ height: 10 }} />
           <Text fontSize={12} color='#666'>
             Pravacy
           </Text>

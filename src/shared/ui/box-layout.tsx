@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ViewProps } from 'react-native';
-import Gap from './gap';
 
 interface BoxLayoutProps extends ViewProps {
   horizontal?: number;
@@ -16,20 +15,17 @@ export const BoxLayout: React.FC<BoxLayoutProps> = ({
   ...props
 }) => {
   return (
-    <>
-      <Gap size={12} style={{ backgroundColor: '#eee' }} />
-      <View
-        style={[
-          {
-            paddingHorizontal: horizontal,
-            paddingVertical: vertical,
-          },
-          style,
-        ]}
-        {...props}
-      >
-        {children}
-      </View>
-    </>
+    <View
+      style={[
+        {
+          paddingHorizontal: horizontal,
+          paddingVertical: vertical,
+        },
+        style,
+      ]}
+      {...props}
+    >
+      {children}
+    </View>
   );
 };

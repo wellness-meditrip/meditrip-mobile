@@ -5,17 +5,19 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "meditripmobile",
+    "scheme": "meditrip-mobile",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meditrip.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.meditrip.app"
     },
     "web": {
       "bundler": "metro",
@@ -32,10 +34,27 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e6be1d01-0f5e-404a-8bdb-96a38f907ef6"
+      },
+      "GOOGLE_CLIENT_ID": "your_google_client_id_here",
+      "LINE_CHANNEL_ID": "2007839926",
+      "LINE_CHANNEL_SECRET": "ef6bbab40ec8ce656635d8a5b9907e77",
+      "LINE_REDIRECT_URI": "https://meditrip-mobile.vercel.app/"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e6be1d01-0f5e-404a-8bdb-96a38f907ef6"
     }
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/src/shared/ui/custom';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface ClinicCardProps {
   name: string;
@@ -19,15 +20,49 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
   image,
   onPress,
 }) => {
+  // 다크모드 색상 적용
+  const cardBackgroundColor = useThemeColor({}, 'background');
+  const badgeBackgroundColor = useThemeColor(
+    { light: 'rgba(255, 255, 255, 0.9)', dark: 'rgba(0, 0, 0, 0.8)' },
+    'background'
+  );
+  const badgeTextColor = useThemeColor(
+    { light: '#333', dark: '#ECEDEE' },
+    'text'
+  );
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+    <TouchableOpacity
+      style={[
+        styles.card,
+        {
+          backgroundColor: cardBackgroundColor,
+          shadowColor: useThemeColor({}, 'text'),
+        },
+      ]}
+      onPress={onPress}
+    >
       <Image source={image} style={styles.image} />
       <View style={styles.badgeContainer}>
-        <View style={styles.locationBadge}>
-          <Text style={styles.locationText}>{location}</Text>
+        <View
+          style={{
+            ...styles.locationBadge,
+            backgroundColor: badgeBackgroundColor,
+          }}
+        >
+          <Text style={{ ...styles.locationText, color: badgeTextColor }}>
+            {location}
+          </Text>
         </View>
-        <View style={styles.ratingBadge}>
-          <Text style={styles.ratingText}>⭐ {rating}</Text>
+        <View
+          style={{
+            ...styles.ratingBadge,
+            backgroundColor: badgeBackgroundColor,
+          }}
+        >
+          <Text style={{ ...styles.ratingText, color: badgeTextColor }}>
+            ⭐ {rating}
+          </Text>
         </View>
       </View>
       <View style={styles.overlay}>
@@ -45,8 +80,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 16,
     overflow: 'hidden',
-    backgroundColor: '#fff',
-    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -68,7 +101,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   locationBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -76,10 +108,8 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
   },
   ratingBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -87,7 +117,6 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
   },
   overlay: {
     position: 'absolute',

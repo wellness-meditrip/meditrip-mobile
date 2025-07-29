@@ -1,27 +1,33 @@
 import React from 'react';
 import {
+  StyleSheet,
   Text as RNText,
   TextProps as RNTextProps,
-  StyleSheet,
 } from 'react-native';
 import { ScaledStyleProps, applyScaledStyles } from './types';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface TextProps extends RNTextProps, ScaledStyleProps {
   variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
   color?: string;
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
+  children?: React.ReactNode;
 }
 
 const Text: React.FC<TextProps> = ({
   variant = 'body',
-  color = '#333',
+  color,
   weight = 'normal',
   align = 'left',
   style,
   children,
   ...props
 }) => {
+  // 다크모드 기본 색상 적용
+  const defaultColor = useThemeColor({}, 'text');
+  const textColor = color || defaultColor;
+
   const getVariantStyle = () => {
     switch (variant) {
       case 'h1':
@@ -59,8 +65,7 @@ const Text: React.FC<TextProps> = ({
     styles.base,
     getVariantStyle(),
     getWeightStyle(),
-    { textAlign: align },
-    color && { color },
+    { textAlign: align, color: textColor },
     scaledStyle,
     style,
   ];
@@ -74,7 +79,7 @@ const Text: React.FC<TextProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    color: '#000000',
+    // color는 동적으로 적용
   },
   // Variants
   h1: {

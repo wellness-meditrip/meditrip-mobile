@@ -1,14 +1,28 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Stack } from 'expo-router';
 
-const _layout = () => {
+const AuthLayout = () => {
   return (
-    <View>
-      <Text>_layout</Text>
-    </View>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen
+        name='login'
+        options={{
+          title: '로그인',
+        }}
+      />
+      <Stack.Screen
+        name='signup'
+        options={{
+          title: '회원가입',
+        }}
+      />
+    </Stack>
   );
 };
 
-export default _layout;
-
-const styles = StyleSheet.create({});
+export default AuthLayout;

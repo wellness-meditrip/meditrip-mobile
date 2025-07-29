@@ -10,6 +10,8 @@ import {
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { BoxLayout } from '@/src/shared/ui/box-layout';
 import { ARROW_LEFT } from '@/assets/icons/components/header';
+import { Button } from '../../../shared/ui/custom';
+import { SafeRouterHandler, useSafeRouter } from '../../../shared/lib';
 
 // 상수 데이터
 const MOCK_RESERVATIONS = [
@@ -144,7 +146,7 @@ const ReviewSection = () => (
   </BoxLayout>
 );
 
-const MenuSection = () => (
+const MenuSection = ({ safeRouter }: { safeRouter: SafeRouterHandler }) => (
   <BoxLayout horizontal={16}>
     <View style={styles.menuContainer}>
       {MENU_ITEMS.map(item => (
@@ -152,11 +154,15 @@ const MenuSection = () => (
           <Text style={styles.menuText}>{item.text}</Text>
         </TouchableOpacity>
       ))}
+      <Button onPress={() => safeRouter.push('/login')}>
+        <Text>로그인</Text>
+      </Button>
     </View>
   </BoxLayout>
 );
 
 const MyPage = () => {
+  const safeRouter = useSafeRouter();
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -164,7 +170,7 @@ const MyPage = () => {
       <ProfileSection />
       <ReservationSection />
       <ReviewSection />
-      <MenuSection />
+      <MenuSection safeRouter={safeRouter} />
     </ParallaxScrollView>
   );
 };

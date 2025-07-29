@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 import Text from './text';
 import { ScaledStyleProps, applyScaledStyles } from './types';
+
+import { useThemeColor } from '@/hooks/useThemeColor';
 import Button from './button';
 
 interface InputProps extends Omit<TextInputProps, 'style'>, ScaledStyleProps {
@@ -29,13 +31,38 @@ const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
+  // 다크모드 색상 적용
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const placeholderColor = useThemeColor(
+    { light: '#8E8E93', dark: '#9BA1A6' },
+    'text'
+  );
+  const labelColor = useThemeColor(
+    { light: '#333333', dark: '#ECEDEE' },
+    'text'
+  );
+  const helperColor = useThemeColor(
+    { light: '#666666', dark: '#9BA1A6' },
+    'text'
+  );
+  const errorColor = '#FF3B30';
+  const borderColor = useThemeColor(
+    { light: '#E0E0E0', dark: '#2C2C2E' },
+    'text'
+  );
+
   // scale 적용된 스타일
   const scaledStyle = applyScaledStyles(props);
 
   const inputStyle = [
     styles.base,
     styles[variant],
-
+    {
+      backgroundColor,
+      color: textColor,
+      borderColor: error ? errorColor : borderColor,
+    },
     error ? styles.error : null,
     leftIcon ? styles.withLeftIcon : null,
     rightIcon ? styles.withRightIcon : null,
@@ -46,7 +73,11 @@ const Input: React.FC<InputProps> = ({
   return (
     <View>
       {label && (
-        <Text variant='label' weight='medium' style={styles.label}>
+        <Text
+          variant='label'
+          weight='medium'
+          style={[styles.label, { color: labelColor }]}
+        >
           {label}
         </Text>
       )}
@@ -56,18 +87,20 @@ const Input: React.FC<InputProps> = ({
 
         <TextInput
           style={inputStyle}
-          placeholderTextColor='#8E8E93'
+          placeholderTextColor={placeholderColor}
           {...props}
         />
 
         {rightIcon && (
           <Button
-            style={[
-              styles.rightIcon,
-              props.value && props.value.length > 0
-                ? styles.rightIconEnabled
-                : styles.rightIconDisabled,
-            ]}
+            style={
+              [
+                styles.rightIcon,
+                props.value && props.value.length > 0
+                  ? styles.rightIconEnabled
+                  : styles.rightIconDisabled,
+              ] as any
+            }
             onPress={onRightIconPress}
             disabled={
               !props.value || props.value.length === 0 || !onRightIconPress
@@ -81,7 +114,7 @@ const Input: React.FC<InputProps> = ({
       {(error || helper) && (
         <Text
           variant='caption'
-          color={error ? '#FF3B30' : '#666666'}
+          color={error ? errorColor : helperColor}
           style={styles.helper}
         >
           {error || helper}
@@ -94,7 +127,6 @@ const Input: React.FC<InputProps> = ({
 const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
-    color: '#333333',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -103,15 +135,17 @@ const styles = StyleSheet.create({
   base: {
     flex: 1,
     fontSize: 16,
-    color: '#1A1A1A',
     minHeight: 48,
     textAlignVertical: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
   },
   outlined: {
-    backgroundColor: '#fff',
+    // backgroundColor는 동적으로 적용
   },
   filled: {
-    backgroundColor: 'fff',
+    // backgroundColor는 동적으로 적용
   },
   focused: {
     borderColor: '#007AFF',

@@ -11,8 +11,8 @@ import Footer from '@/src/widgets/footer';
 import { SEARCH } from '@/assets/icons/components';
 import { CategoryButton } from '@/src/shared/ui/CategoryButton';
 import { ClinicSlider } from '@/src/shared/ui/ClinicSlider';
-import { CATEGORIES, Category } from './constants';
-import { ARROW_LEFT } from '../../../../assets/icons/components/header';
+import { CATEGORIES, Category } from '@/src/shared/lib/constants';
+import { ARROW_LEFT } from '@/assets/icons/components/header';
 
 export default function HomeScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -74,9 +74,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-    >
+    <ParallaxScrollView>
       {/* <BoxLayout>
         <Input
           placeholder='Search'

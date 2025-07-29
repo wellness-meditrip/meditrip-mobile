@@ -17,7 +17,11 @@ type Props = PropsWithChildren<{
   headerBackgroundColor?: { dark: string; light: string };
 }>;
 
-export default function ParallaxScrollView({ children }: Props) {
+export default function ParallaxScrollView({
+  children,
+  headerImage,
+  headerBackgroundColor,
+}: Props) {
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const bottom = useBottomTabOverflow();
