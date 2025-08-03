@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
   },
   // Variants
   primary: {
@@ -149,26 +148,6 @@ const styles = StyleSheet.create({
   },
   ghost: {
     // backgroundColor는 동적으로 적용
-  },
-  // Sizes
-  small: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 32,
-  },
-  medium: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 44,
-  },
-  large: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    minHeight: 56,
-  },
-  // States
-  disabled: {
-    opacity: 0.5,
   },
 });
 

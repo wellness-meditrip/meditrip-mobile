@@ -19,13 +19,13 @@ const Login = () => {
     setGoogleLoading(true);
     try {
       const result = await signInWithGoogle();
-      if (result.success) {
+      if (result.success && result.user) {
         Alert.alert(
           '성공',
-          `${result.user.name || result.user.display_name}님, 환영합니다!`
+          `${result.user.displayName || result.user.email || '사용자'}님, 환영합니다!\n이메일: ${result.user.email || '이메일 없음'}`
         );
-        // TODO: 로그인 성공 후 메인 화면으로 이동
-        // router.replace('/(tabs)');
+        // 로그인 성공 후 메인 화면으로 이동
+        router.replace('/(tabs)/home');
       } else {
         Alert.alert('오류', result.error);
       }
@@ -40,10 +40,13 @@ const Login = () => {
     setLineLoading(true);
     try {
       const result = await signInWithLine();
-      if (result.success) {
-        Alert.alert('성공', `${result.user.displayName}님, 환영합니다!`);
-        // TODO: 로그인 성공 후 메인 화면으로 이동
-        // router.replace('/(tabs)');
+      if (result.success && result.user) {
+        Alert.alert(
+          '성공',
+          `${result.user.displayName || '사용자'}님, 환영합니다!\n라인 ID: ${result.user.uid || 'ID 없음'}`
+        );
+        // 로그인 성공 후 메인 화면으로 이동
+        router.replace('/(tabs)/home');
       } else {
         Alert.alert('오류', result.error);
       }
@@ -116,6 +119,23 @@ const Login = () => {
             <Text
               style={[
                 styles.signupButtonText,
+                (googleLoading || lineLoading) && styles.disabledText,
+              ]}
+            >
+              회원가입
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.signupSection}>
+          <Text style={styles.signupText}>계정이 없으신가요? </Text>
+          <TouchableOpacity
+            onPress={handleSignup}
+            disabled={googleLoading || lineLoading}
+          >
+            <Text
+              style={[
+                styles.signupLink,
                 (googleLoading || lineLoading) && styles.disabledText,
               ]}
             >
@@ -229,5 +249,20 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     opacity: 0.6,
+  },
+  signupSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  signupText: {
+    color: '#666',
+    fontSize: 14,
+  },
+  signupLink: {
+    color: '#007AFF',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

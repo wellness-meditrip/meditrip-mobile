@@ -5,6 +5,7 @@ export default function MyPageLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: 'none',
       }}
     >
       <Stack.Screen

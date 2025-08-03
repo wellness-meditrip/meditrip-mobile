@@ -4,14 +4,19 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { BoxLayout } from '@/src/shared/ui/box-layout';
 import { ARROW_LEFT } from '@/assets/icons/components/header';
 import { Button } from '../../../shared/ui/custom';
 import { SafeRouterHandler, useSafeRouter } from '../../../shared/lib';
+import { useAtom } from 'jotai';
+import {
+  profileImageAtom,
+  profileInfoAtom,
+} from '@/src/shared/lib/profile-store';
 
 // 상수 데이터
 const MOCK_RESERVATIONS = [
@@ -66,30 +71,42 @@ const MENU_ITEMS = [
 const renderStars = (rating: number) => '★'.repeat(rating);
 
 // 컴포넌트들
-const ProfileSection = () => (
-  <BoxLayout horizontal={16}>
-    <View style={styles.profileContainer}>
-      <View style={styles.profileInfo}>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={styles.profileImage}
-        />
-        <View style={styles.profileText}>
-          <View style={styles.nameRow}>
-            <Text style={styles.userName}>Elena Duran</Text>
+const ProfileSection = ({ safeRouter }: { safeRouter: SafeRouterHandler }) => {
+  const [profileImage] = useAtom(profileImageAtom);
+  const [profileInfo] = useAtom(profileInfoAtom);
+
+  return (
+    <BoxLayout horizontal={16}>
+      <View style={styles.profileContainer}>
+        <View style={styles.profileInfo}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <Image
+              source={require('@/assets/images/react-logo.png')}
+              style={styles.profileImage}
+            />
+          )}
+          <View style={styles.profileText}>
+            <View style={styles.nameRow}>
+              <Text style={styles.userName}>{profileInfo.nickname}</Text>
+            </View>
+            <View style={styles.countryInfo}>
+              <View style={styles.japanFlag} />
+              <Text style={styles.countryText}>{profileInfo.country}</Text>
+            </View>
           </View>
-          <View style={styles.countryInfo}>
-            <View style={styles.japanFlag} />
-            <Text style={styles.countryText}>Japan</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => safeRouter.push('/my-page/profile')}
+          >
+            <Text style={styles.editIcon}>⚙️</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editIcon}>⚙️</Text>
-        </TouchableOpacity>
       </View>
-    </View>
-  </BoxLayout>
-);
+    </BoxLayout>
+  );
+};
 
 const ReservationSection = () => (
   <BoxLayout horizontal={16}>
@@ -167,7 +184,7 @@ const MyPage = () => {
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
     >
-      <ProfileSection />
+      <ProfileSection safeRouter={safeRouter} />
       <ReservationSection />
       <ReviewSection />
       <MenuSection safeRouter={safeRouter} />

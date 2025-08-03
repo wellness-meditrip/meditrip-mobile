@@ -7,23 +7,40 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+// 스플래시 화면이 자동으로 숨겨지지 않도록 방지
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
+    'Pretendard-Regular': require('../../assets/fonts/Pretendard-Regular.otf'),
+    'Pretendard-Medium': require('../../assets/fonts/Pretendard-Medium.otf'),
+    'Pretendard-SemiBold': require('../../assets/fonts/Pretendard-SemiBold.otf'),
+    'Pretendard-Bold': require('../../assets/fonts/Pretendard-Bold.otf'),
+    'Pretendard-Light': require('../../assets/fonts/Pretendard-Light.otf'),
+    'Pretendard-ExtraBold': require('../../assets/fonts/Pretendard-ExtraBold.otf'),
+    'Pretendard-Black': require('../../assets/fonts/Pretendard-Black.otf'),
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   if (!loaded) {
-    // Async font loading only occurs in development.
+    // 글꼴 로딩 중에는 스플래시 화면 유지
     return null;
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      onLayout={async () => {
+        // 앱이 준비되면 스플래시 화면 숨기기
+        await SplashScreen.hideAsync();
+      }}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -31,7 +48,12 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
-          <Stack>
+          <Stack
+            screenOptions={{
+              animation: 'none', // 네비게이션 애니메이션 비활성화
+              headerShown: false,
+            }}
+          >
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
             <Stack.Screen name='(auth)' options={{ headerShown: false }} />
             <Stack.Screen name='+not-found' />

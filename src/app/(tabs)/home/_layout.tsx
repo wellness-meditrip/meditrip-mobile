@@ -5,6 +5,7 @@ export default function HomeLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: 'none',
       }}
     >
       <Stack.Screen

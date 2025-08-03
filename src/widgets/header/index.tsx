@@ -24,7 +24,9 @@ const Header = () => {
     <View style={styles.container}>
       {!isTopLevelPage && (
         <Button onPress={handleGoBack}>
-          <ARROW_LEFT width={scale(24)} height={scale(24)} />
+          <View>
+            <ARROW_LEFT width={scale(24)} height={scale(24)} />
+          </View>
         </Button>
       )}
       {isTopLevelPage && <Bin />}

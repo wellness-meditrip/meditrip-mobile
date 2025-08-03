@@ -84,7 +84,7 @@ export default function HomeScreen() {
       </BoxLayout> */}
       <BoxLayout horizontal={8}>
         <View style={{ paddingHorizontal: 8 }}>
-          <Text style={styles.title}>Choose your interests</Text>
+          <Text style={styles.title}>진료 카테고리를 선택해보세요</Text>
         </View>
         <View style={styles.categoryContainer}>
           {CATEGORIES.map(renderCategoryButton)}

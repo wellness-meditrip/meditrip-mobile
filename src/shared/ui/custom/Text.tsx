@@ -8,7 +8,15 @@ import { ScaledStyleProps, applyScaledStyles } from './types';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface TextProps extends RNTextProps, ScaledStyleProps {
-  variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
+  variant?:
+    | 'title-l'
+    | 'title-m'
+    | 'title-s'
+    | 'body-m'
+    | 'body-s'
+    | 'button-l'
+    | 'button-m'
+    | 'button-s';
   color?: string;
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
@@ -30,18 +38,24 @@ const Text: React.FC<TextProps> = ({
 
   const getVariantStyle = () => {
     switch (variant) {
-      case 'h1':
-        return styles.h1;
-      case 'h2':
-        return styles.h2;
-      case 'h3':
-        return styles.h3;
-      case 'caption':
-        return styles.caption;
-      case 'label':
-        return styles.label;
+      case 'title-l':
+        return styles.titleL;
+      case 'title-m':
+        return styles.titleM;
+      case 'title-s':
+        return styles.titleS;
+      case 'body-m':
+        return styles.bodyM;
+      case 'body-s':
+        return styles.bodyS;
+      case 'button-l':
+        return styles.buttonL;
+      case 'button-m':
+        return styles.buttonM;
+      case 'button-s':
+        return styles.buttonS;
       default:
-        return styles.body;
+        return styles.bodyM;
     }
   };
 
@@ -79,45 +93,65 @@ const Text: React.FC<TextProps> = ({
 
 const styles = StyleSheet.create({
   base: {
+    fontFamily: 'Pretendard-Regular',
     // color는 동적으로 적용
   },
-  // Variants
-  h1: {
-    fontSize: 32,
-    lineHeight: 40,
-  },
-  h2: {
-    fontSize: 24,
-    lineHeight: 32,
-  },
-  h3: {
+  // Title Variants
+  titleL: {
     fontSize: 20,
     lineHeight: 28,
+    fontFamily: 'Pretendard-ExtraBold',
+    fontWeight: 'bold',
   },
-  body: {
+  titleM: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontFamily: 'Pretendard-SemiBold',
+  },
+  titleS: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: 'Pretendard-Medium',
   },
-  caption: {
+  // Body Variants
+  bodyM: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: 'Pretendard-Regular',
   },
-  label: {
+  bodyS: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 18,
+    fontFamily: 'Pretendard-Regular',
   },
-  // Weights
+  // Button Variants
+  buttonL: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: 'Pretendard-Medium',
+  },
+  buttonM: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: 'Pretendard-Medium',
+  },
+  buttonS: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: 'Pretendard-Medium',
+  },
+  // Weights (기존 weight prop 사용 시)
   normal: {
-    fontWeight: '400',
+    fontFamily: 'Pretendard-Regular',
   },
   medium: {
-    fontWeight: '500',
+    fontFamily: 'Pretendard-Medium',
   },
   semibold: {
-    fontWeight: '600',
+    fontFamily: 'Pretendard-SemiBold',
   },
   bold: {
-    fontWeight: '700',
+    fontFamily: 'Pretendard-Bold',
   },
 });
 

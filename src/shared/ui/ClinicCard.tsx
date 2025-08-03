@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Text, View } from '@/src/shared/ui/custom';
 import { useThemeColor } from '@/hooks/useThemeColor';
 

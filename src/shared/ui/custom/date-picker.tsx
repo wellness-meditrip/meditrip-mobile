@@ -3,6 +3,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { scale } from '../../lib/scale-utils';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { CALENDAR } from '@/assets/icons/main';
 
 interface DatePickerProps {
   placeholder?: string;
@@ -12,7 +13,7 @@ interface DatePickerProps {
 }
 
 const CalendarIcon = ({ width, height }: { width: number; height: number }) => (
-  <View style={{ width, height, backgroundColor: 'transparent' }} />
+  <CALENDAR width={width} height={height} />
 );
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -57,11 +58,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   const formatDisplayDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
   };
 
   const handleDateSelect = (day: any) => {

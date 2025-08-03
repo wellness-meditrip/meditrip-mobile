@@ -1,5 +1,6 @@
 import React from 'react';
 import { SELF } from '@/assets/icons/main';
+import { Image } from 'expo-image';
 
 export interface Category {
   id: string;
@@ -10,27 +11,42 @@ export interface Category {
 export const CATEGORIES: Category[] = [
   {
     id: 'mental',
-    label: 'Mental',
-    icon: React.createElement(SELF),
+    label: '스트레스',
+    icon: React.createElement(Image, {
+      source: require('@/assets/icons/main/mental.webp'),
+      style: { width: 32, height: 32 },
+    }),
   },
   {
     id: 'woman',
-    label: 'Woman',
-    icon: React.createElement(SELF),
+    label: '여성질환',
+    icon: React.createElement(Image, {
+      source: require('@/assets/icons/main/women.webp'),
+      style: { width: 32, height: 32 },
+    }),
   },
   {
     id: 'anti-aging',
-    label: 'Anti-aging',
-    icon: React.createElement(SELF),
+    label: '안티에이징',
+    icon: React.createElement(Image, {
+      source: require('@/assets/icons/main/anti-aging.webp'),
+      style: { width: 32, height: 32 },
+    }),
   },
   {
     id: 'immunity',
-    label: 'Immunity',
-    icon: React.createElement(SELF),
+    label: '면역관리',
+    icon: React.createElement(Image, {
+      source: require('@/assets/icons/main/immun.webp'),
+      style: { width: 32, height: 32 },
+    }),
   },
   {
     id: 'diet-detox',
-    label: 'Diet&Detox',
-    icon: React.createElement(SELF),
+    label: '체중감량',
+    icon: React.createElement(Image, {
+      source: require('@/assets/icons/main/diet-detox.webp'),
+      style: { width: 32, height: 32 },
+    }),
   },
 ];

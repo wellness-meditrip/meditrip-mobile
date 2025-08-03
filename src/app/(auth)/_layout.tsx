@@ -1,12 +1,14 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import Header from '../../widgets/header';
 
 const AuthLayout = () => {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
+        headerShown: true,
+        header: () => <Header />,
+        animation: 'none',
       }}
     >
       <Stack.Screen

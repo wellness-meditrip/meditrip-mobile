@@ -9,7 +9,18 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.meditrip.app"
+      "bundleIdentifier": "com.meditrip.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meditrip.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "associatedDomains": ["applinks:meditrip-mobile.vercel.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +28,20 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.meditrip.app"
+      "package": "com.meditrip.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "meditrip-mobile.vercel.app"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -35,26 +59,28 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font"
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "e6be1d01-0f5e-404a-8bdb-96a38f907ef6"
       },
-      "GOOGLE_CLIENT_ID": "your_google_client_id_here",
+      "GOOGLE_CLIENT_ID": "397287998102-o0gei5mtv0l86lf12hcqg5lo0mtsim3e.apps.googleusercontent.com",
+      "GOOGLE_REDIRECT_URI": "https://auth.expo.io/@lumpenop/meditrip-mobile",
       "LINE_CHANNEL_ID": "2007839926",
       "LINE_CHANNEL_SECRET": "ef6bbab40ec8ce656635d8a5b9907e77",
-      "LINE_REDIRECT_URI": "https://meditrip-mobile.vercel.app/"
+      "LINE_REDIRECT_URI": "https://auth.expo.io/@lumpenop/meditrip-mobile"
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/e6be1d01-0f5e-404a-8bdb-96a38f907ef6"
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

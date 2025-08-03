@@ -2,20 +2,20 @@ import { useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 
-export default function AuthHandler() {
+export default function DeepLinkHandler() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
   useEffect(() => {
-    const handleAuth = async () => {
+    const handleDeepLink = async () => {
       try {
-        console.log('Auth handler received:', params);
+        console.log('Deep link received:', params);
 
         // OAuth 인증 코드가 있으면 처리
         if (params.code) {
           console.log('OAuth code received:', params.code);
 
-          // 실제 OAuth 토큰 교환 및 사용자 정보 가져오기
+          // 인증 코드로 사용자 정보 가져오기 (모의 데이터)
           const userInfo = await exchangeCodeForUserInfo(params.code as string);
 
           if (userInfo) {
@@ -49,13 +49,13 @@ export default function AuthHandler() {
           router.replace('/(auth)/login');
         }
       } catch (error) {
-        console.error('Auth processing error:', error);
+        console.error('Deep link processing error:', error);
         Alert.alert('로그인 실패', '인증 처리 중 오류가 발생했습니다.');
         router.replace('/(auth)/login');
       }
     };
 
-    handleAuth();
+    handleDeepLink();
   }, [params, router]);
 
   return (
@@ -83,7 +83,7 @@ const exchangeCodeForUserInfo = async (code: string) => {
     // const { access_token } = await response.json();
 
     // 액세스 토큰으로 사용자 정보 가져오기 (실제 구현 시)
-    // const userResponse = await fetch('https://api.line.me/v2/profile', {
+    // const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
     //   headers: { 'Authorization': `Bearer ${access_token}` }
     // });
     // const userInfo = await userResponse.json();
@@ -92,11 +92,11 @@ const exchangeCodeForUserInfo = async (code: string) => {
     await new Promise(resolve => setTimeout(resolve, 2000)); // 실제 API 호출 시뮬레이션
 
     return {
-      uid: `line-user-${Date.now()}`,
-      email: 'user@line.com',
-      displayName: 'LINE User',
+      uid: `user-${Date.now()}`,
+      email: 'user@example.com',
+      displayName: '테스트 사용자',
       photoURL: 'https://via.placeholder.com/150',
-      provider: 'line',
+      provider: 'google', // 또는 'line'
     };
   } catch (error) {
     console.error('사용자 정보 가져오기 오류:', error);

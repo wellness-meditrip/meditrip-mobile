@@ -34,7 +34,14 @@ export const CategoryButton = React.memo<CategoryButtonProps>(
             disabled && styles.disabledButton,
           ]}
         >
-          <ThemedView style={styles.iconContainer}>{icon}</ThemedView>
+          <ThemedView
+            style={[
+              styles.iconContainer,
+              isSelected && styles.selectedIconContainer,
+            ]}
+          >
+            {icon}
+          </ThemedView>
           <ThemedText style={[styles.label, disabled && styles.disabledLabel]}>
             {label}
           </ThemedText>
@@ -71,7 +78,15 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   iconContainer: {
-    marginBottom: 8,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  selectedIconContainer: {
+    backgroundColor: '#E3F2FD',
   },
   label: {
     fontSize: 14,
