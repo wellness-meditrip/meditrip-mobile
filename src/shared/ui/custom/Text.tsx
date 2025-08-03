@@ -1,28 +1,86 @@
 import React from 'react';
-import { Text as RNText, TextProps as RNTextProps, StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  Text as RNText,
+  TextProps as RNTextProps,
+} from 'react-native';
+import { ScaledStyleProps, applyScaledStyles } from './types';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
-export interface TextProps extends RNTextProps {
-  variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
+interface TextProps extends RNTextProps, ScaledStyleProps {
+  variant?:
+    | 'title-l'
+    | 'title-m'
+    | 'title-s'
+    | 'body-m'
+    | 'body-s'
+    | 'button-l'
+    | 'button-m'
+    | 'button-s';
   color?: string;
   weight?: 'normal' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
+  children?: React.ReactNode;
 }
 
-export const Text: React.FC<TextProps> = ({
+const Text: React.FC<TextProps> = ({
   variant = 'body',
-  color = '#333',
+  color,
   weight = 'normal',
   align = 'left',
   style,
   children,
   ...props
 }) => {
+  // 다크모드 기본 색상 적용
+  const defaultColor = useThemeColor({}, 'text');
+  const textColor = color || defaultColor;
+
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'title-l':
+        return styles.titleL;
+      case 'title-m':
+        return styles.titleM;
+      case 'title-s':
+        return styles.titleS;
+      case 'body-m':
+        return styles.bodyM;
+      case 'body-s':
+        return styles.bodyS;
+      case 'button-l':
+        return styles.buttonL;
+      case 'button-m':
+        return styles.buttonM;
+      case 'button-s':
+        return styles.buttonS;
+      default:
+        return styles.bodyM;
+    }
+  };
+
+  const getWeightStyle = () => {
+    switch (weight) {
+      case 'medium':
+        return styles.medium;
+      case 'semibold':
+        return styles.semibold;
+      case 'bold':
+        return styles.bold;
+      default:
+        return styles.normal;
+    }
+  };
+
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
+
   const textStyle = [
     styles.base,
-    styles[variant],
-    styles[weight],
-    { textAlign: align },
-    color && { color },
+    getVariantStyle(),
+    getWeightStyle(),
+    { textAlign: align, color: textColor },
+    scaledStyle,
     style,
   ];
 
@@ -35,44 +93,66 @@ export const Text: React.FC<TextProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    color: '#000000',
+    fontFamily: 'Pretendard-Regular',
+    // color는 동적으로 적용
   },
-  // Variants
-  h1: {
-    fontSize: 32,
-    lineHeight: 40,
-  },
-  h2: {
-    fontSize: 24,
-    lineHeight: 32,
-  },
-  h3: {
+  // Title Variants
+  titleL: {
     fontSize: 20,
     lineHeight: 28,
+    fontFamily: 'Pretendard-ExtraBold',
+    fontWeight: 'bold',
   },
-  body: {
+  titleM: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontFamily: 'Pretendard-SemiBold',
+  },
+  titleS: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: 'Pretendard-Medium',
   },
-  caption: {
+  // Body Variants
+  bodyM: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: 'Pretendard-Regular',
   },
-  label: {
+  bodyS: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 18,
+    fontFamily: 'Pretendard-Regular',
   },
-  // Weights
+  // Button Variants
+  buttonL: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: 'Pretendard-Medium',
+  },
+  buttonM: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily: 'Pretendard-Medium',
+  },
+  buttonS: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: 'Pretendard-Medium',
+  },
+  // Weights (기존 weight prop 사용 시)
   normal: {
-    fontWeight: '400',
+    fontFamily: 'Pretendard-Regular',
   },
   medium: {
-    fontWeight: '500',
+    fontFamily: 'Pretendard-Medium',
   },
   semibold: {
-    fontWeight: '600',
+    fontFamily: 'Pretendard-SemiBold',
   },
   bold: {
-    fontWeight: '700',
+    fontFamily: 'Pretendard-Bold',
   },
-}); 
+});
+
+export default Text;

@@ -2,17 +2,22 @@ import { Stack } from 'expo-router';
 
 export default function MyPageLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+      }}
+    >
       <Stack.Screen
-        name="index"
+        name='index'
         options={{
-          title: "My Page",
+          title: 'My Page',
         }}
       />
       <Stack.Screen
-        name="profile"
+        name='profile'
         options={{
-          title: "프로필",
+          title: '프로필',
         }}
       />
     </Stack>

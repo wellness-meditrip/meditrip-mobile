@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-const fs = require("fs");
+const fs = require('fs');
 
 // 커밋 메시지 파일 경로를 가져옵니다.
 const commitMessageFilePath = process.argv[2];
 
 // 커밋 메시지를 읽어옵니다.
-const commitMessage = fs.readFileSync(commitMessageFilePath, "utf-8").trim();
+const commitMessage = fs.readFileSync(commitMessageFilePath, 'utf-8').trim();
 
 // 병합 커밋 메시지 검증 제외
-if (commitMessage.startsWith("Merge branch")) {
+if (commitMessage.startsWith('Merge branch')) {
   process.exit(0); // 병합 커밋 메시지는 검증을 건너뜁니다.
 }
 
@@ -17,7 +17,7 @@ const commitMessagePattern =
   /^(feat|fix|style|design|HOTFIX|refactor|docs|chore|lint|deploy|rename|remove|type|comment|struct|SEO|setting):\s.{1,40}\s#\d+$/;
 
 // 이모지 제거: 이모지가 있다면 제거하고, 나머지 텍스트만 검증
-const sanitizedCommitMessage = commitMessage.replace(/^[^\w\s]+/, "").trim(); // 이모지 부분을 제거
+const sanitizedCommitMessage = commitMessage.replace(/^[^\w\s]+/, '').trim(); // 이모지 부분을 제거
 
 // 커밋 메시지 형식을 검증합니다.
 if (!commitMessagePattern.test(sanitizedCommitMessage)) {

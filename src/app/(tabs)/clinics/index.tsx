@@ -1,44 +1,43 @@
-import { router } from 'expo-router'
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 const Clinics = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Clinics</Text>
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={() => router.push('/clinics/clinic-list')}
-      >
-        <Text style={styles.buttonText}>클리닉 리스트 보기</Text>
-      </TouchableOpacity>
-    </View>
-  )
-}
+    <SafeAreaView style={styles.container} edges={[]}>
+      <WebView
+        source={{ uri: 'https://meditrip-web-eta.vercel.app/clinics' }}
+        style={styles.webview}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        startInLoadingState={false}
+        scalesPageToFit={true}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        cacheEnabled={true}
+        cacheMode='LOAD_DEFAULT'
+        allowsBackForwardNavigationGestures={true}
+        incognito={false}
+        pullToRefreshEnabled={true}
+        // 미리 로드 최적화
+        preloadEnabled={true}
+        allowsLinkPreview={false}
+        mediaPlaybackRequiresUserAction={false}
+      />
+    </SafeAreaView>
+  );
+};
 
-export default Clinics
+export default Clinics;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingBottom: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 30,
+  webview: {
+    flex: 1,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-}) 
+});

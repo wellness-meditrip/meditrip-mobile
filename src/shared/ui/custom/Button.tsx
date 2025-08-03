@@ -1,81 +1,133 @@
 import React from 'react';
 import {
-  ActivityIndicator,
-  Pressable,
-  PressableProps,
   StyleSheet,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  ViewStyle,
 } from 'react-native';
-import { Text } from './Text';
+import Text from './text';
+import { ScaledStyleProps, applyScaledStyles } from './types';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
-export interface ButtonProps extends PressableProps {
+interface ButtonProps extends TouchableOpacityProps, ScaledStyleProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'small' | 'medium' | 'large';
-  loading?: boolean;
   disabled?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  style?: ViewStyle;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'medium',
-  loading = false,
   disabled = false,
   children,
   style,
   ...props
 }) => {
-  const textColor = getTextColor(variant, disabled);
+  // 다크모드 색상 적용 - Hook은 최상위 레벨에서만 호출
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const tintColor = useThemeColor({}, 'tint');
+  const secondaryBgColor = useThemeColor(
+    { light: '#F2F2F7', dark: '#2C2C2E' },
+    'background'
+  );
+  const disabledBgColor = useThemeColor(
+    { light: '#F2F2F7', dark: '#2C2C2E' },
+    'background'
+  );
+  const disabledBorderColor = useThemeColor(
+    { light: '#E0E0E0', dark: '#3A3A3C' },
+    'text'
+  );
+  const disabledTextColor = useThemeColor(
+    { light: '#999999', dark: '#6D6D70' },
+    'text'
+  );
+
+  const getBackgroundColor = (): string => {
+    if (disabled) return disabledBgColor;
+
+    switch (variant) {
+      case 'primary':
+        return tintColor;
+      case 'secondary':
+        return secondaryBgColor;
+      case 'outline':
+        return 'transparent';
+      case 'ghost':
+        return 'transparent';
+      default:
+        return tintColor;
+    }
+  };
+
+  const getBorderColor = (): string => {
+    if (disabled) return disabledBorderColor;
+
+    switch (variant) {
+      case 'outline':
+        return tintColor;
+      default:
+        return 'transparent';
+    }
+  };
+
+  const getTextColor = (): string => {
+    if (disabled) return disabledTextColor;
+
+    switch (variant) {
+      case 'primary':
+        return '#FFFFFF';
+      case 'secondary':
+        return textColor;
+      case 'outline':
+        return tintColor;
+      case 'ghost':
+        return textColor;
+      default:
+        return '#FFFFFF';
+    }
+  };
+
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
+
+  const buttonStyle = [
+    styles.base,
+    styles[variant],
+    styles[size],
+    {
+      backgroundColor: getBackgroundColor(),
+      borderColor: getBorderColor(),
+    },
+    disabled && styles.disabled,
+    scaledStyle,
+    style,
+  ];
 
   return (
-    <Pressable
-      style={({ pressed }) => {
-        const buttonStyles: any[] = [
-          styles.base,
-          styles[variant],
-          styles[size],
-        ];
-        
-        if (disabled) buttonStyles.push(styles.disabled);
-        if (pressed) buttonStyles.push(styles.pressed);
-        if (style) buttonStyles.push(style);
-        
-        return buttonStyles;
-      }}
-      disabled={disabled || loading}
-      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+    <TouchableOpacity
+      style={buttonStyle}
+      disabled={disabled}
+      activeOpacity={0.8}
       {...props}
     >
-      {loading ? (
-        <ActivityIndicator color={textColor} size="small" />
-      ) : (
+      {typeof children === 'string' ? (
         <Text
-          variant="body"
-          weight="semibold"
-          color={textColor}
-          align="center"
+          variant='body'
+          weight='semibold'
+          color={getTextColor()}
+          align='center'
         >
           {children}
         </Text>
+      ) : (
+        children
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
-};
-
-const getTextColor = (variant: string, disabled: boolean): string => {
-  if (disabled) return '#999999';
-  
-  switch (variant) {
-    case 'primary':
-      return '#FFFFFF';
-    case 'secondary':
-      return '#007AFF';
-    case 'outline':
-      return '#007AFF';
-    case 'ghost':
-      return '#007AFF';
-    default:
-      return '#FFFFFF';
-  }
 };
 
 const styles = StyleSheet.create({
@@ -86,40 +138,17 @@ const styles = StyleSheet.create({
   },
   // Variants
   primary: {
-    backgroundColor: '#007AFF',
+    // backgroundColor는 동적으로 적용
   },
   secondary: {
-    backgroundColor: '#F2F2F7',
+    // backgroundColor는 동적으로 적용
   },
   outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
+    // backgroundColor는 동적으로 적용
   },
   ghost: {
-    backgroundColor: 'transparent',
+    // backgroundColor는 동적으로 적용
   },
-  // Sizes
-  small: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minHeight: 32,
-  },
-  medium: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    minHeight: 44,
-  },
-  large: {
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    minHeight: 56,
-  },
-  // States
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.8,
-  },
-}); 
+});
+
+export default Button;

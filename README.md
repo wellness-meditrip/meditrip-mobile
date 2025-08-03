@@ -2,6 +2,34 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## SVG Icons
+
+이 프로젝트는 SVG 파일들을 React Native 컴포넌트로 사용할 수 있도록 설정되어 있습니다.
+
+### 사용법
+
+```tsx
+import { Icon } from '@/components/icons';
+
+// 기본 사용법
+<Icon name="arrow-left" />
+
+// 크기와 색상 커스터마이징
+<Icon name="search" size={32} color="#007AFF" />
+
+// 사용 가능한 아이콘들
+// - arrow-left: 왼쪽 화살표
+// - search: 검색 아이콘
+// - self: 사용자 아이콘
+```
+
+### 새로운 SVG 아이콘 추가하기
+
+1. `assets/icons/` 폴더에 SVG 파일을 추가
+2. `components/icons/index.tsx`에서 import 추가
+3. `IconName` 타입에 새 아이콘 이름 추가
+4. `iconMap`에 매핑 추가
+
 ## Get started
 
 1. Install dependencies

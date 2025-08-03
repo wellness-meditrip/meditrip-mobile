@@ -2,19 +2,24 @@ import { Stack } from 'expo-router';
 
 export default function ClinicsLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+      }}
+    >
       <Stack.Screen
-        name="index"
+        name='index'
         options={{
-          title: "Clinics",
+          title: 'Clinics',
         }}
       />
       <Stack.Screen
-        name="clinic-list"
+        name='clinic-list'
         options={{
-          title: "클리닉 리스트",
+          title: '클리닉 리스트',
         }}
       />
     </Stack>
   );
-} 
+}

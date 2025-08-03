@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  TextInputProps,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { Text } from './Text';
+import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
+import Text from './text';
+import { ScaledStyleProps, applyScaledStyles } from './types';
 
-export interface InputProps extends Omit<TextInputProps, 'style'> {
+import { useThemeColor } from '@/hooks/useThemeColor';
+import Button from './button';
+
+interface InputProps extends Omit<TextInputProps, 'style'>, ScaledStyleProps {
   label?: string;
   error?: string;
   helper?: string;
@@ -22,7 +20,7 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
   style?: any;
 }
 
-export const Input: React.FC<InputProps> = ({
+const Input: React.FC<InputProps> = ({
   label,
   error,
   helper,
@@ -33,56 +31,90 @@ export const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  // 다크모드 색상 적용
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const placeholderColor = useThemeColor(
+    { light: '#8E8E93', dark: '#9BA1A6' },
+    'text'
+  );
+  const labelColor = useThemeColor(
+    { light: '#333333', dark: '#ECEDEE' },
+    'text'
+  );
+  const helperColor = useThemeColor(
+    { light: '#666666', dark: '#9BA1A6' },
+    'text'
+  );
+  const errorColor = '#FF3B30';
+  const borderColor = useThemeColor(
+    { light: '#E0E0E0', dark: '#2C2C2E' },
+    'text'
+  );
+
+  // scale 적용된 스타일
+  const scaledStyle = applyScaledStyles(props);
 
   const inputStyle = [
     styles.base,
     styles[variant],
-    isFocused ? styles.focused : null,
+    {
+      backgroundColor,
+      color: textColor,
+      borderColor: error ? errorColor : borderColor,
+    },
     error ? styles.error : null,
     leftIcon ? styles.withLeftIcon : null,
     rightIcon ? styles.withRightIcon : null,
+    scaledStyle,
     style,
   ];
 
   return (
-    <View style={styles.container}>
+    <View>
       {label && (
-        <Text variant="label" weight="medium" style={styles.label}>
+        <Text
+          variant='label'
+          weight='medium'
+          style={[styles.label, { color: labelColor }]}
+        >
           {label}
         </Text>
       )}
-      
+
       <View style={styles.inputContainer}>
-        {leftIcon && (
-          <View style={styles.leftIcon}>
-            {leftIcon}
-          </View>
-        )}
-        
+        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+
         <TextInput
           style={inputStyle}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholderTextColor="#8E8E93"
+          placeholderTextColor={placeholderColor}
           {...props}
         />
-        
+
         {rightIcon && (
-          <TouchableOpacity
-            style={styles.rightIcon}
+          <Button
+            style={
+              [
+                styles.rightIcon,
+                props.value && props.value.length > 0
+                  ? styles.rightIconEnabled
+                  : styles.rightIconDisabled,
+              ] as any
+            }
             onPress={onRightIconPress}
-            disabled={!onRightIconPress}
+            disabled={
+              !props.value || props.value.length === 0 || !onRightIconPress
+            }
           >
             {rightIcon}
-          </TouchableOpacity>
+          </Button>
         )}
       </View>
-      
+
       {(error || helper) && (
         <Text
-          variant="caption"
-          color={error ? '#FF3B30' : '#666666'}
+          variant='caption'
+          color={error ? errorColor : helperColor}
           style={styles.helper}
         >
           {error || helper}
@@ -93,12 +125,8 @@ export const Input: React.FC<InputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
   label: {
     marginBottom: 8,
-    color: '#333333',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -107,19 +135,17 @@ const styles = StyleSheet.create({
   base: {
     flex: 1,
     fontSize: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    minHeight: 48,
+    textAlignVertical: 'center',
+    borderWidth: 1,
     borderRadius: 8,
-    color: '#1A1A1A',
+    paddingHorizontal: 16,
   },
   outlined: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
+    // backgroundColor는 동적으로 적용
   },
   filled: {
-    backgroundColor: '#F2F2F7',
-    borderWidth: 0,
+    // backgroundColor는 동적으로 적용
   },
   focused: {
     borderColor: '#007AFF',
@@ -143,7 +169,15 @@ const styles = StyleSheet.create({
     right: 16,
     zIndex: 1,
   },
+  rightIconEnabled: {
+    opacity: 1,
+  },
+  rightIconDisabled: {
+    opacity: 0.3,
+  },
   helper: {
     marginTop: 4,
   },
-}); 
+});
+
+export default Input;
