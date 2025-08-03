@@ -4,6 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import { scale } from '../../lib/scale-utils';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { CALENDAR } from '@/assets/icons/main';
+import { ColorPalette } from '@/constants/Colors';
 
 interface DatePickerProps {
   placeholder?: string;
@@ -23,6 +24,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   style,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [tempSelectedDate, setTempSelectedDate] = useState<string | undefined>(
+    selectedDate
+  );
 
   // 다크모드 색상 적용
   const backgroundColor = useThemeColor({}, 'background');
@@ -48,7 +52,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     'text'
   );
   const closeButtonColor = useThemeColor(
-    { light: '#007AFF', dark: '#0A84FF' },
+    { light: ColorPalette.primaryColor50, dark: ColorPalette.primaryColor50 },
     'tint'
   );
   const disabledTextColor = useThemeColor(
@@ -66,14 +70,30 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   const handleDateSelect = (day: any) => {
     const dateString = day.dateString;
-    onChange?.(dateString);
+    setTempSelectedDate(dateString);
+  };
+
+  const handleConfirm = () => {
+    if (tempSelectedDate) {
+      onChange?.(tempSelectedDate);
+    }
     setIsVisible(false);
+  };
+
+  const handleCancel = () => {
+    setTempSelectedDate(selectedDate);
+    setIsVisible(false);
+  };
+
+  const handleOpenModal = () => {
+    setTempSelectedDate(selectedDate);
+    setIsVisible(true);
   };
 
   return (
     <>
       <TouchableOpacity
-        onPress={() => setIsVisible(true)}
+        onPress={handleOpenModal}
         style={[
           styles.dateInput,
           {
@@ -98,7 +118,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         visible={isVisible}
         transparent={true}
         animationType='slide'
-        onRequestClose={() => setIsVisible(false)}
+        onRequestClose={handleCancel}
       >
         <View
           style={[styles.modalOverlay, { backgroundColor: modalOverlayColor }]}
@@ -111,7 +131,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 날짜 선택
               </Text>
               <TouchableOpacity
-                onPress={() => setIsVisible(false)}
+                onPress={handleCancel}
                 style={styles.closeButton}
               >
                 <Text
@@ -124,18 +144,19 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             <Calendar
               onDayPress={handleDateSelect}
               markedDates={
-                selectedDate
+                tempSelectedDate
                   ? {
-                      [selectedDate]: {
+                      [tempSelectedDate]: {
                         selected: true,
-                        selectedColor: '#007AFF',
+                        selectedColor: ColorPalette.primaryColor10,
+                        selectedTextColor: ColorPalette.primaryColor50,
                       },
                     }
                   : {}
               }
               theme={{
-                selectedDayBackgroundColor: '#007AFF',
-                selectedDayTextColor: '#ffffff',
+                selectedDayBackgroundColor: ColorPalette.primaryColor10,
+                selectedDayTextColor: ColorPalette.primaryColor50,
                 todayTextColor: textColor,
                 dayTextColor: textColor,
                 textDisabledColor: disabledTextColor,
@@ -151,6 +172,29 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 backgroundColor: modalBgColor,
               }}
             />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={handleCancel}
+                style={[styles.button, styles.cancelButton]}
+              >
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: ColorPalette.primaryColor50 },
+                  ]}
+                >
+                  취소
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleConfirm}
+                style={[styles.button, styles.confirmButton]}
+              >
+                <Text style={[styles.buttonText, { color: '#ffffff' }]}>
+                  확인
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -200,6 +244,30 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   closeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap: 12,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: ColorPalette.primaryColor50,
+  },
+  confirmButton: {
+    backgroundColor: ColorPalette.primaryColor50,
+  },
+  buttonText: {
     fontSize: 16,
     fontWeight: '600',
   },

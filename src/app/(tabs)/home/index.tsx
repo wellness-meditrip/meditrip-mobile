@@ -13,9 +13,11 @@ import { CategoryButton } from '@/src/shared/ui/CategoryButton';
 import { ClinicSlider } from '@/src/shared/ui/ClinicSlider';
 import { CATEGORIES, Category } from '@/src/shared/lib/constants';
 import { ARROW_LEFT } from '@/assets/icons/components/header';
+import { ColorPalette } from '@/constants/Colors';
 
 export default function HomeScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
 
   const handleCategoryPress = useCallback((categoryId: string) => {
     setSelectedCategories(prev => {
@@ -25,6 +27,10 @@ export default function HomeScreen() {
         return [...prev, categoryId];
       }
     });
+  }, []);
+
+  const handleDateChange = useCallback((date: string) => {
+    setSelectedDate(date);
   }, []);
 
   // 임시 클리닉 데이터
@@ -94,7 +100,8 @@ export default function HomeScreen() {
         <Text style={styles.title}>Select your visit date</Text>
         <DatePicker
           placeholder='방문 날짜를 선택하세요'
-          onChange={date => console.log('Selected date:', date)}
+          selectedDate={selectedDate}
+          onChange={handleDateChange}
           style={styles.datePicker}
         />
       </BoxLayout>
@@ -103,7 +110,7 @@ export default function HomeScreen() {
           style={styles.button}
           onPress={() => router.push('/home/dashboard')}
         >
-          <ThemedText style={styles.buttonText}>Search</ThemedText>
+          <ThemedText style={styles.buttonText}>찾기</ThemedText>
         </Button>
       </ThemedView>
       <BoxLayout>
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '34%',
-    backgroundColor: '#007AFF',
+    backgroundColor: ColorPalette.primaryColor50,
     paddingHorizontal: 24,
     paddingVertical: 8,
     borderRadius: 100,

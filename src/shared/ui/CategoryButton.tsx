@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ColorPalette } from '@/constants/Colors';
 
 interface CategoryButtonProps {
   icon: React.ReactNode;
@@ -30,14 +31,22 @@ export const CategoryButton = React.memo<CategoryButtonProps>(
         <ThemedView
           style={[
             styles.button,
-            isSelected ? styles.selectedButton : styles.defaultButton,
+            isSelected
+              ? [
+                  styles.selectedButton,
+                  { backgroundColor: ColorPalette.primaryColor10 },
+                ]
+              : styles.defaultButton,
             disabled && styles.disabledButton,
           ]}
         >
           <ThemedView
             style={[
               styles.iconContainer,
-              isSelected && styles.selectedIconContainer,
+              isSelected && [
+                styles.selectedIconContainer,
+                { backgroundColor: ColorPalette.primaryColor10 },
+              ],
             ]}
           >
             {icon}
