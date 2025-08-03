@@ -110,21 +110,6 @@ const Login = () => {
               />
             )}
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.signupButton}
-            onPress={handleSignup}
-            disabled={googleLoading || lineLoading}
-          >
-            <Text
-              style={[
-                styles.signupButtonText,
-                (googleLoading || lineLoading) && styles.disabledText,
-              ]}
-            >
-              회원가입
-            </Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.signupSection}>
@@ -157,8 +142,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingHorizontal: 20,
+    paddingTop: 60,
   },
   title: {
     fontSize: 32,

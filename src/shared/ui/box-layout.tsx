@@ -5,6 +5,7 @@ interface BoxLayoutProps extends ViewProps {
   horizontal?: number;
   vertical?: number;
   children: React.ReactNode;
+  backgroundColor?: string;
 }
 
 export const BoxLayout: React.FC<BoxLayoutProps> = ({
@@ -12,6 +13,7 @@ export const BoxLayout: React.FC<BoxLayoutProps> = ({
   vertical = 20,
   children,
   style,
+  backgroundColor,
   ...props
 }) => {
   return (
@@ -20,6 +22,7 @@ export const BoxLayout: React.FC<BoxLayoutProps> = ({
         {
           paddingHorizontal: horizontal,
           paddingVertical: vertical,
+          backgroundColor,
         },
         style,
       ]}

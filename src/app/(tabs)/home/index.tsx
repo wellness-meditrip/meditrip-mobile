@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { useState, useCallback } from 'react';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -14,6 +14,7 @@ import { ClinicSlider } from '@/src/shared/ui/ClinicSlider';
 import { CATEGORIES, Category } from '@/src/shared/lib/constants';
 import { ARROW_LEFT } from '@/assets/icons/components/header';
 import { ColorPalette } from '@/constants/Colors';
+import { scale } from '../../../shared/lib';
 
 export default function HomeScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -113,12 +114,20 @@ export default function HomeScreen() {
           <ThemedText style={styles.buttonText}>찾기</ThemedText>
         </Button>
       </ThemedView>
-      <BoxLayout>
-        <View style={styles.recomendedClinicsContainer}>
-          <Text style={styles.title}>Recomended Clinics</Text>
+      <BoxLayout horizontal={0} backgroundColor={ColorPalette.primaryColor10}>
+        <TouchableOpacity
+          style={styles.recomendedClinicsContainer}
+          onPress={() => router.push('/clinics')}
+        >
+          <Text style={styles.title}>추천 병원</Text>
           <ARROW_LEFT style={{ transform: [{ rotate: '180deg' }] }} />
+        </TouchableOpacity>
+        <View style={styles.recommendedClinicsBackground}>
+          <ClinicSlider
+            clinics={mockClinics}
+            onClinicPress={handleClinicPress}
+          />
         </View>
-        <ClinicSlider clinics={mockClinics} onClinicPress={handleClinicPress} />
       </BoxLayout>
       <Footer />
     </ParallaxScrollView>
@@ -132,6 +141,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    paddingHorizontal: scale(16),
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -161,5 +171,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  recommendedClinicsBackground: {
+    marginTop: 8,
+    paddingVertical: 16,
   },
 });

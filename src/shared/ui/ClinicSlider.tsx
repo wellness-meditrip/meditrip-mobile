@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { View } from '@/src/shared/ui/custom';
 import { ClinicCard } from './ClinicCard';
+import { scale } from '../lib/scale-utils';
 
 interface Clinic {
   id: string;
@@ -22,7 +23,7 @@ export const ClinicSlider: React.FC<ClinicSliderProps> = ({
   onClinicPress,
 }) => {
   return (
-    <View style={styles.container}>
+    <View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -48,10 +49,7 @@ export const ClinicSlider: React.FC<ClinicSliderProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 16,
-  },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingLeft: scale(10),
   },
 });
