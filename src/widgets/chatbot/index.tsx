@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    bottom: scale(80),
+    bottom: scale(68),
     right: scale(10),
     width: scale(60),
     height: scale(60),
