@@ -14,6 +14,8 @@ import Button from '../../shared/ui/custom/button';
 import { CLOSE, ROTATE, SEND } from '../../../assets/icons';
 import Input from '../../shared/ui/custom/input';
 import { useSendChatMessage } from '../../shared/config/api-hooks';
+import ChatMessage from './ChatMessage';
+import TypingIndicator from './TypingIndicator';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -159,32 +161,15 @@ const Chatbot = () => {
               showsVerticalScrollIndicator={false}
             >
               {chatHistory.map((item, index) => (
-                <View key={index} style={styles.messageContainer}>
-                  <View
-                    style={[
-                      styles.messageBubble,
-                      item.isUser ? styles.userBubble : styles.botBubble,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.messageText,
-                        item.isUser ? styles.userText : styles.botText,
-                      ]}
-                    >
-                      {item.message}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.timeText,
-                      { alignSelf: item.isUser ? 'flex-end' : 'flex-start' },
-                    ]}
-                  >
-                    {item.time}
-                  </Text>
-                </View>
+                <ChatMessage
+                  key={index}
+                  message={item.message}
+                  isUser={item.isUser}
+                  time={item.time}
+                />
               ))}
+
+              {isPending && <TypingIndicator />}
             </ScrollView>
           </View>
           <View style={styles.modalFooter}>
@@ -256,48 +241,6 @@ const styles = StyleSheet.create({
     paddingTop: scale(12),
     paddingBottom: scale(8),
     paddingHorizontal: scale(20),
-  },
-  messageContainer: {
-    marginBottom: scale(2),
-    alignItems: 'flex-start',
-  },
-  messageBubble: {
-    paddingHorizontal: scale(16),
-    paddingVertical: scale(12),
-    borderTopLeftRadius: scale(18),
-    borderTopRightRadius: scale(18),
-    borderBottomRightRadius: scale(18),
-    maxWidth: '80%',
-  },
-  userBubble: {
-    backgroundColor: ColorPalette.subGreen,
-    borderBottomLeftRadius: scale(18),
-    borderBottomRightRadius: scale(0),
-    borderTopRightRadius: scale(18),
-    borderTopLeftRadius: scale(18),
-    alignSelf: 'flex-end',
-  },
-  botBubble: {
-    backgroundColor: '#FFFFFF',
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  messageText: {
-    fontSize: scale(16),
-    lineHeight: scale(22),
-  },
-  userText: {
-    color: '#FFFFFF',
-  },
-  botText: {
-    color: '#000000',
-  },
-  timeText: {
-    fontSize: scale(12),
-    color: '#999999',
-    marginTop: scale(4),
-    alignSelf: 'flex-start',
   },
   modalFooter: {
     width: '100%',
