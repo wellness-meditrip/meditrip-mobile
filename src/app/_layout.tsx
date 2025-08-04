@@ -9,8 +9,10 @@ import { StatusBar } from 'expo-status-bar';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { queryClient } from '../shared/config';
 
 // 스플래시 화면이 자동으로 숨겨지지 않도록 방지
 SplashScreen.preventAutoHideAsync();
@@ -34,33 +36,35 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1 }}
-      onLayout={async () => {
-        // 앱이 준비되면 스플래시 화면 숨기기
-        await SplashScreen.hideAsync();
-      }}
-    >
-      <KeyboardAvoidingView
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        onLayout={async () => {
+          // 앱이 준비되면 스플래시 화면 숨기기
+          await SplashScreen.hideAsync();
+        }}
       >
-        <ThemeProvider
-          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <Stack
-            screenOptions={{
-              animation: 'none', // 네비게이션 애니메이션 비활성화
-              headerShown: false,
-            }}
+          <ThemeProvider
+            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
           >
-            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-            <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-            <Stack.Screen name='+not-found' />
-          </Stack>
-          <StatusBar style='auto' />
-        </ThemeProvider>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            <Stack
+              screenOptions={{
+                animation: 'none', // 네비게이션 애니메이션 비활성화
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+              <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+              <Stack.Screen name='+not-found' />
+            </Stack>
+            <StatusBar style='auto' />
+          </ThemeProvider>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </QueryClientProvider>
   );
 }

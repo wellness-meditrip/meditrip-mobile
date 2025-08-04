@@ -5,7 +5,11 @@ import { usePathname } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-const Header = () => {
+interface HeaderProps {
+  title?: string;
+}
+
+const Header = ({ title }: HeaderProps) => {
   const safeRouter = useSafeRouter();
   const pathname = usePathname();
 
@@ -31,7 +35,7 @@ const Header = () => {
       )}
       {isTopLevelPage && <Bin />}
       <Text fontSize={18} weight='bold'>
-        MEDITRIP
+        {title || 'MEDITRIP'}
       </Text>
       <Bin />
     </View>
