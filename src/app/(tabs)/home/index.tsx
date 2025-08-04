@@ -15,6 +15,7 @@ import { CATEGORIES, Category } from '@/src/shared/lib/constants';
 import { ARROW_LEFT } from '@/assets/icons/components/header';
 import { ColorPalette } from '@/constants/Colors';
 import { scale } from '../../../shared/lib';
+import { Icon } from '../../../../components/icons';
 
 export default function HomeScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -97,6 +98,7 @@ export default function HomeScreen() {
           {CATEGORIES.map(renderCategoryButton)}
         </View>
       </BoxLayout>
+
       <BoxLayout>
         <Text style={styles.title}>Select your visit date</Text>
         <DatePicker

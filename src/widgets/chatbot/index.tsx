@@ -239,7 +239,6 @@ const styles = StyleSheet.create({
   },
   chatContent: {
     paddingTop: scale(12),
-    paddingBottom: scale(8),
     paddingHorizontal: scale(20),
   },
   modalFooter: {

@@ -4,8 +4,7 @@ import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors, ColorPalette } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { ColorPalette } from '@/constants/Colors';
 import Header from '@/src/widgets/header';
 import {
   HOME,
@@ -16,16 +15,17 @@ import {
   MY_PAGE_COLOR,
 } from '@/assets/icons/components';
 import Chatbot from '../../widgets/chatbot';
+import { scale } from '../../shared/lib/scale-utils';
+import { Icon } from '../../../components/icons';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <>
       <Tabs
         initialRouteName='home'
         screenOptions={{
           tabBarActiveTintColor: ColorPalette.primaryColor50,
+          tabBarInactiveTintColor: ColorPalette.primary,
           tabBarLabelStyle: {
             fontWeight: 'bold',
           },
@@ -35,10 +35,14 @@ export default function TabLayout() {
           tabBarBackground: TabBarBackground,
           tabBarStyle: Platform.select({
             ios: {
-              // Use a transparent background on iOS to show the blur effect
-              position: 'absolute',
+              position: 'relative',
+              height: 68,
+              paddingTop: 8,
             },
-            default: {},
+            default: {
+              height: 68,
+              paddingTop: 8,
+            },
           }),
           animation: 'none',
         }}
@@ -47,24 +51,36 @@ export default function TabLayout() {
           name='home'
           options={{
             title: 'Home',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <HOME_COLOR width={24} height={24} />
-              ) : (
-                <HOME width={24} height={24} />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                name='ic-home'
+                size={scale(26)}
+                color={
+                  focused ? ColorPalette.primaryColor50 : ColorPalette.primary
+                }
+              />
+            ),
+            tabBarLabel: 'Home',
+            tabBarLabelStyle: {
+              fontSize: scale(12),
+            },
           }}
         />
         <Tabs.Screen
           name='clinics'
           options={{
             title: 'Clinics',
+            headerShown: false,
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <CLINICS_COLOR width={24} height={24} />
+                <CLINICS_COLOR width={scale(26)} height={scale(26)} />
               ) : (
-                <CLINICS width={24} height={24} />
+                <CLINICS width={scale(26)} height={scale(26)} />
               ),
+            tabBarLabel: 'Clinics',
+            tabBarLabelStyle: {
+              fontSize: scale(12),
+            },
           }}
         />
         <Tabs.Screen
@@ -73,10 +89,14 @@ export default function TabLayout() {
             title: 'My Page',
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <MY_PAGE_COLOR width={24} height={24} />
+                <MY_PAGE_COLOR width={scale(26)} height={scale(26)} />
               ) : (
-                <MY_PAGE width={24} height={24} />
+                <MY_PAGE width={scale(26)} height={scale(26)} />
               ),
+            tabBarLabel: 'My Page',
+            tabBarLabelStyle: {
+              fontSize: scale(12),
+            },
           }}
         />
       </Tabs>

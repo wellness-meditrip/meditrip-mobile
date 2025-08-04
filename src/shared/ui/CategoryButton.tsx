@@ -3,9 +3,11 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ColorPalette } from '@/constants/Colors';
+import { Icon, IconName } from '../../../components/icons';
+import { scale } from '../lib/scale-utils';
 
 interface CategoryButtonProps {
-  icon: React.ReactNode;
+  icon: IconName;
   label: string;
   isSelected?: boolean;
   onPress?: () => void;
@@ -49,7 +51,7 @@ export const CategoryButton = React.memo<CategoryButtonProps>(
               ],
             ]}
           >
-            {icon}
+            <Icon name={icon} size={scale(24)} color={ColorPalette.primary} />
           </ThemedView>
           <ThemedText style={[styles.label, disabled && styles.disabledLabel]}>
             {label}

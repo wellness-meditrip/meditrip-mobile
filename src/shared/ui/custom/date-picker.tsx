@@ -3,8 +3,8 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { scale } from '../../lib/scale-utils';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { CALENDAR } from '@/assets/icons/main';
 import { ColorPalette } from '@/constants/Colors';
+import { Icon } from '../../../../components/icons';
 
 interface DatePickerProps {
   placeholder?: string;
@@ -12,10 +12,6 @@ interface DatePickerProps {
   onChange?: (date: string) => void;
   style?: any;
 }
-
-const CalendarIcon = ({ width, height }: { width: number; height: number }) => (
-  <CALENDAR width={width} height={height} />
-);
 
 export const DatePicker: React.FC<DatePickerProps> = ({
   placeholder = '날짜를 선택하세요',
@@ -111,7 +107,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         >
           {selectedDate ? formatDisplayDate(selectedDate) : placeholder}
         </Text>
-        <CalendarIcon width={20} height={20} />
+        <Icon
+          name='ic-calendar'
+          size={scale(20)}
+          color={ColorPalette.primary}
+        />
       </TouchableOpacity>
 
       <Modal

@@ -15,5 +15,6 @@ export default function BlurTabBarBackground() {
 }
 
 export function useBottomTabOverflow() {
-  return useBottomTabBarHeight();
+  // 탭바가 고정되었으므로 하단 패딩 불필요
+  return 0;
 }

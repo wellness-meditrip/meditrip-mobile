@@ -11,12 +11,14 @@ export default function ClinicsLayout() {
       <Stack.Screen
         name='index'
         options={{
+          headerShown: false,
           title: 'Clinics',
         }}
       />
       <Stack.Screen
         name='clinic-list'
         options={{
+          headerShown: false,
           title: '클리닉 리스트',
         }}
       />
