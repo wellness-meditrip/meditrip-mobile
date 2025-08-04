@@ -103,119 +103,127 @@ const Profile = () => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor }]}>
-      {/* 계정 정보 섹션 */}
-      <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          계정 정보
-        </Text>
-
-        {/* 프로필 사진 */}
-        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-          <View
-            style={[styles.avatar, { backgroundColor: avatarBackgroundColor }]}
-          >
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <Text style={styles.cameraIcon}>📷</Text>
-            )}
-          </View>
-        </TouchableOpacity>
-
-        {/* 별명 */}
-        <View style={styles.inputContainer}>
-          <Text style={[styles.inputLabel, { color: textColor }]}>별명</Text>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: inputBackgroundColor,
-                borderColor: borderColor,
-                color: textColor,
-              },
-            ]}
-            value={nickname}
-            onChangeText={setNickname}
-            placeholder='별명을 입력하세요'
-            placeholderTextColor={secondaryTextColor}
-          />
-        </View>
-      </View>
-
-      {/* 연락처 정보 섹션 */}
-      <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          연락처 정보
-        </Text>
-
-        {/* 이메일 주소 */}
-        <View style={styles.inputContainer}>
-          <Text style={[styles.inputLabel, { color: textColor }]}>
-            이메일 주소
+    <>
+      <ScrollView style={[styles.container, { backgroundColor }]}>
+        {/* 계정 정보 섹션 */}
+        <View
+          style={[styles.section, { backgroundColor: cardBackgroundColor }]}
+        >
+          <Text style={[styles.sectionTitle, { color: textColor }]}>
+            계정 정보
           </Text>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: inputBackgroundColor,
-                borderColor: borderColor,
-                color: textColor,
-              },
-            ]}
-            value={email}
-            onChangeText={setEmail}
-            placeholder='이메일을 입력하세요'
-            placeholderTextColor={secondaryTextColor}
-            keyboardType='email-address'
-          />
+
+          {/* 프로필 사진 */}
+          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+            <View
+              style={[
+                styles.avatar,
+                { backgroundColor: avatarBackgroundColor },
+              ]}
+            >
+              {profileImage ? (
+                <Image
+                  source={{ uri: profileImage }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <Text style={styles.cameraIcon}>📷</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          {/* 별명 */}
+          <View style={styles.inputContainer}>
+            <Text style={[styles.inputLabel, { color: textColor }]}>별명</Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: inputBackgroundColor,
+                  borderColor: borderColor,
+                  color: textColor,
+                },
+              ]}
+              value={nickname}
+              onChangeText={setNickname}
+              placeholder='별명을 입력하세요'
+              placeholderTextColor={secondaryTextColor}
+            />
+          </View>
         </View>
 
-        {/* 라인 ID */}
-        <View style={styles.inputContainer}>
-          <Text style={[styles.inputLabel, { color: textColor }]}>라인 ID</Text>
-          <TextInput
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: inputBackgroundColor,
-                borderColor: borderColor,
-                color: textColor,
-              },
-            ]}
-            value={lineId}
-            onChangeText={setLineId}
-            placeholder='라인 ID를 입력하세요'
-            placeholderTextColor={secondaryTextColor}
+        {/* 연락처 정보 섹션 */}
+        <View
+          style={[styles.section, { backgroundColor: cardBackgroundColor }]}
+        >
+          <Text style={[styles.sectionTitle, { color: textColor }]}>
+            연락처 정보
+          </Text>
+
+          {/* 이메일 주소 */}
+          <View style={styles.inputContainer}>
+            <Text style={[styles.inputLabel, { color: textColor }]}>
+              이메일 주소
+            </Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: inputBackgroundColor,
+                  borderColor: borderColor,
+                  color: textColor,
+                },
+              ]}
+              value={email}
+              onChangeText={setEmail}
+              placeholder='이메일을 입력하세요'
+              placeholderTextColor={secondaryTextColor}
+              keyboardType='email-address'
+            />
+          </View>
+
+          {/* 라인 ID */}
+          <View style={styles.inputContainer}>
+            <Text style={[styles.inputLabel, { color: textColor }]}>
+              라인 ID
+            </Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: inputBackgroundColor,
+                  borderColor: borderColor,
+                  color: textColor,
+                },
+              ]}
+              value={lineId}
+              onChangeText={setLineId}
+              placeholder='라인 ID를 입력하세요'
+              placeholderTextColor={secondaryTextColor}
+            />
+          </View>
+        </View>
+
+        {/* 국가 및 언어 설정 섹션 */}
+        <View
+          style={[styles.section, { backgroundColor: cardBackgroundColor }]}
+        >
+          <Text style={[styles.sectionTitle, { color: textColor }]}>
+            국가 및 언어 설정
+          </Text>
+
+          <CountryLanguagePicker
+            selectedCountry={selectedCountry}
+            selectedLanguage={selectedLanguage}
+            onCountrySelect={handleCountrySelect}
+            onLanguageSelect={handleLanguageSelect}
           />
         </View>
-      </View>
-
-      {/* 국가 및 언어 설정 섹션 */}
-      <View style={[styles.section, { backgroundColor: cardBackgroundColor }]}>
-        <Text style={[styles.sectionTitle, { color: textColor }]}>
-          국가 및 언어 설정
-        </Text>
-
-        <CountryLanguagePicker
-          selectedCountry={selectedCountry}
-          selectedLanguage={selectedLanguage}
-          onCountrySelect={handleCountrySelect}
-          onLanguageSelect={handleLanguageSelect}
-        />
-      </View>
-
-      {/* 저장 버튼 */}
+      </ScrollView>
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>저장하기</Text>
       </TouchableOpacity>
-
-      {/* 하단 여백 추가 */}
-      <View style={{ height: 50 }} />
-    </ScrollView>
+    </>
   );
 };
 
@@ -224,7 +232,7 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   section: {
     borderRadius: 12,
@@ -282,8 +290,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
+    marginHorizontal: 20,
+    marginVertical: 8,
   },
   saveButtonText: {
     color: '#fff',
