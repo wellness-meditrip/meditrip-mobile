@@ -11,6 +11,7 @@ interface ClinicCardProps {
   rating: number;
   image: any;
   onPress?: () => void;
+  isLast?: boolean;
 }
 
 export const ClinicCard: React.FC<ClinicCardProps> = ({
@@ -20,6 +21,7 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
   rating,
   image,
   onPress,
+  isLast = false,
 }) => {
   // 다크모드 색상 적용
   const cardBackgroundColor = useThemeColor({}, 'background');
@@ -39,6 +41,7 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
         {
           backgroundColor: cardBackgroundColor,
           shadowColor: useThemeColor({}, 'text'),
+          marginRight: isLast ? 0 : 16,
         },
       ]}
       onPress={onPress}

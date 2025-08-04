@@ -90,10 +90,9 @@ export default function HomeScreen() {
           style={styles.searchInput}
         />
       </BoxLayout> */}
-      <BoxLayout horizontal={8}>
-        <View style={{ paddingHorizontal: 8 }}>
-          <Text style={styles.title}>진료 카테고리를 선택해보세요</Text>
-        </View>
+      <BoxLayout>
+        <Text style={styles.title}>진료 카테고리를 선택해보세요</Text>
+
         <View style={styles.categoryContainer}>
           {CATEGORIES.map(renderCategoryButton)}
         </View>
@@ -103,6 +102,7 @@ export default function HomeScreen() {
         <Text style={styles.title}>Select your visit date</Text>
         <DatePicker
           placeholder='방문 날짜를 선택하세요'
+          placeholderTextColor={ColorPalette.tertiary}
           selectedDate={selectedDate}
           onChange={handleDateChange}
           style={styles.datePicker}
@@ -116,7 +116,7 @@ export default function HomeScreen() {
           <ThemedText style={styles.buttonText}>찾기</ThemedText>
         </Button>
       </ThemedView>
-      <BoxLayout horizontal={0} backgroundColor={ColorPalette.primaryColor10}>
+      <BoxLayout horizontal={16} backgroundColor={ColorPalette.primaryColor10}>
         <TouchableOpacity
           style={styles.recomendedClinicsContainer}
           onPress={() => router.push('/clinics')}
@@ -143,11 +143,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    paddingHorizontal: scale(16),
+    paddingHorizontal: 4,
   },
   categoryContainer: {
     flexDirection: 'row',
     marginTop: 16,
+    width: '100%',
+
+    justifyContent: 'space-between',
   },
   stepContainer: {
     alignItems: 'center',

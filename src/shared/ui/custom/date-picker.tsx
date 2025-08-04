@@ -11,6 +11,7 @@ interface DatePickerProps {
   selectedDate?: string;
   onChange?: (date: string) => void;
   style?: any;
+  placeholderTextColor?: string;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -18,6 +19,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   selectedDate,
   onChange,
   style,
+  placeholderTextColor,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [tempSelectedDate, setTempSelectedDate] = useState<string | undefined>(
@@ -102,7 +104,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <Text
           style={[
             styles.dateText,
-            { color: selectedDate ? textColor : placeholderColor },
+            {
+              color: selectedDate ? textColor : placeholderTextColor,
+            },
           ]}
         >
           {selectedDate ? formatDisplayDate(selectedDate) : placeholder}
@@ -110,7 +114,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <Icon
           name='ic-calendar'
           size={scale(20)}
-          color={ColorPalette.primary}
+          color={placeholderTextColor}
         />
       </TouchableOpacity>
 
@@ -163,6 +167,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 arrowColor: textColor,
                 monthTextColor: textColor,
                 indicatorColor: textColor,
+                textSectionTitleColor: textColor,
                 textDayFontWeight: '300',
                 textMonthFontWeight: 'bold',
                 textDayHeaderFontWeight: '300',

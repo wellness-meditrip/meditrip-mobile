@@ -23,33 +23,30 @@ export const ClinicSlider: React.FC<ClinicSliderProps> = ({
   onClinicPress,
 }) => {
   return (
-    <View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        decelerationRate='fast'
-        snapToInterval={296} // card width + marginRight
-        snapToAlignment='start'
-      >
-        {clinics.map(clinic => (
-          <ClinicCard
-            key={clinic.id}
-            name={clinic.name}
-            specialty={clinic.specialty}
-            location={clinic.location}
-            rating={clinic.rating}
-            image={clinic.image}
-            onPress={() => onClinicPress?.(clinic)}
-          />
-        ))}
-      </ScrollView>
-    </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+      decelerationRate='fast'
+      snapToInterval={296} // card width + marginRight
+      snapToAlignment='start'
+    >
+      {clinics.map((clinic, index) => (
+        <ClinicCard
+          key={clinic.id}
+          name={clinic.name}
+          specialty={clinic.specialty}
+          location={clinic.location}
+          rating={clinic.rating}
+          image={clinic.image}
+          onPress={() => onClinicPress?.(clinic)}
+          isLast={index === clinics.length - 1}
+        />
+      ))}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingLeft: scale(10),
-  },
+  scrollContent: {},
 });
