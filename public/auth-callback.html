@@ -37,8 +37,8 @@
       console.log('OAuth callback received:', { code, state });
 
       if (code) {
-        // 앱 딥링크로 리디렉션
-        const deepLink = `expo://meditrip-mobile/auth-callback?code=${code}&state=${state || ''}`;
+        // 앱 딥링크로 리디렉션 (올바른 스키마 사용)
+        const deepLink = `meditrip-mobile://auth?code=${code}&state=${state || ''}`;
         console.log('Redirecting to:', deepLink);
 
         // 딥링크로 리디렉션
@@ -46,8 +46,7 @@
       } else {
         // 인증 코드가 없으면 에러 처리
         console.error('No code received');
-        window.location.href =
-          'expo://meditrip-mobile/auth-callback?error=no_code';
+        window.location.href = 'meditrip-mobile://auth?error=no_code';
       }
     </script>
   </body>
