@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, API_ENDPOINTS } from './api-client';
+import { API_CONFIG } from './api';
 import { queryKeys } from './query-client';
 import {
   UserSchema,
@@ -10,7 +11,9 @@ import {
   ChatHistoryResponseSchema,
   ChatMessageSchema,
   LoginRequestSchema,
+  LoginResponseSchema,
   SignupRequestSchema,
+  SignupResponseSchema,
   UpdateProfileRequestSchema,
   CreateBookingRequestSchema,
   SendChatMessageRequestSchema,
@@ -20,69 +23,135 @@ import {
   type Booking,
   type ChatMessage,
   type LoginRequest,
+  type LoginResponse,
   type SignupRequest,
+  type SignupResponse,
   type UpdateProfileRequest,
   type CreateBookingRequest,
   type SendChatMessageRequest,
   type ClinicSearchRequest,
+  CreateProfileRequest,
+  CreateProfileResponse,
+  CreateProfileRequestSchema,
+  CreateProfileResponseSchema,
 } from './schemas';
+import { loginUser, signupUser, createProfile } from './api-function';
 
 // 인증 관련 훅들
 export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (credentials: LoginRequest) => {
-      const validatedData = LoginRequestSchema.parse(credentials);
+    mutationFn: async (userData: LoginRequest): Promise<LoginResponse> => {
+      const validatedData = LoginRequestSchema.parse(userData);
       const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, validatedData);
 
-      if (response.success && response.data?.token) {
-        api.setAuthToken(response.data.token);
+      // 중첩된 응답 구조 처리
+      const actualResponse = response.data || response;
+
+      // 응답 데이터 검증
+      const validatedResponse = LoginResponseSchema.parse(actualResponse);
+
+      if (validatedResponse.success && validatedResponse.tokens) {
+        // access_token을 우선적으로 찾기
+        if (validatedResponse.tokens.access_token) {
+          await api.setAuthToken(validatedResponse.tokens.access_token);
+        } else {
+          // 기존 로직 (첫 번째 토큰 사용)
+          const tokenKeys = Object.keys(validatedResponse.tokens);
+          if (tokenKeys.length > 0) {
+            const firstToken = validatedResponse.tokens[tokenKeys[0]];
+            if (typeof firstToken === 'string') {
+              await api.setAuthToken(firstToken);
+            }
+          }
+        }
       }
 
-      return response;
+      return validatedResponse;
     },
     onSuccess: () => {
       // 로그인 성공 시 사용자 프로필 캐시 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
     },
+    onError: error => {
+      console.error('로그인 중 오류 발생:', error);
+    },
   });
 };
 
 export const useSignup = () => {
-  return useMutation({
-    mutationFn: async (userData: SignupRequest) => {
-      const validatedData = SignupRequestSchema.parse(userData);
-      return await api.post(API_ENDPOINTS.AUTH.SIGNUP, validatedData);
-    },
-  });
-};
-
-export const useUserProfile = () => {
-  return useQuery({
-    queryKey: queryKeys.auth.profile(),
-    queryFn: async () => {
-      const response = await api.get(API_ENDPOINTS.USER.PROFILE);
-      if (response.success && response.data) {
-        return UserSchema.parse(response.data);
-      }
-      throw new Error(response.error || '프로필을 불러올 수 없습니다.');
-    },
-    enabled: false, // 수동으로 호출하도록 설정
-  });
-};
-
-export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (profileData: UpdateProfileRequest) => {
-      const validatedData = UpdateProfileRequestSchema.parse(profileData);
-      return await api.put(API_ENDPOINTS.USER.UPDATE_PROFILE, validatedData);
+    mutationFn: async (userData: SignupRequest): Promise<SignupResponse> => {
+      const validatedData = SignupRequestSchema.parse(userData);
+      const response = await api.post(API_ENDPOINTS.AUTH.SIGNUP, validatedData);
+
+      // 응답 데이터 검증
+      const validatedResponse = SignupResponseSchema.parse(response);
+
+      if (validatedResponse.success && validatedResponse.tokens) {
+        // access_token을 우선적으로 찾기
+        if (validatedResponse.tokens.access_token) {
+          await api.setAuthToken(validatedResponse.tokens.access_token);
+        } else {
+          // 기존 로직 (첫 번째 토큰 사용)
+          const tokenKeys = Object.keys(validatedResponse.tokens);
+          if (tokenKeys.length > 0) {
+            const firstTokenKey = tokenKeys[0];
+            const firstToken = validatedResponse.tokens[firstTokenKey];
+            if (typeof firstToken === 'string') {
+              await api.setAuthToken(firstToken);
+            }
+          }
+        }
+      }
+
+      return validatedResponse;
     },
     onSuccess: () => {
-      // 프로필 업데이트 성공 시 캐시 무효화
+      // 회원가입 성공 시 사용자 프로필 캐시 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
+    },
+    onError: error => {
+      console.error('회원가입 중 오류 발생:', error);
+    },
+  });
+};
+
+export const useCreateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (
+      profileData: CreateProfileRequest
+    ): Promise<CreateProfileResponse> => {
+      // 토큰 확인
+      const currentToken = await api.loadAuthToken();
+      if (!currentToken) {
+        return {
+          success: false,
+          error: '인증 토큰이 필요합니다. 다시 로그인해주세요.',
+        };
+      }
+
+      const validatedData = CreateProfileRequestSchema.parse(profileData);
+      const response = await api.post(
+        API_ENDPOINTS.USER.CREATE_PROFILE,
+        validatedData
+      );
+
+      // 응답 데이터 검증
+      const validatedResponse = CreateProfileResponseSchema.parse(response);
+      return validatedResponse;
+    },
+    onSuccess: data => {
+      // 성공 시 쿼리 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
+    },
+    onError: error => {
+      console.error('프로필 생성 중 오류 발생:', error);
     },
   });
 };

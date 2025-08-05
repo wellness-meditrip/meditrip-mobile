@@ -34,7 +34,7 @@ const Header = ({ title }: HeaderProps) => {
         </Button>
       )}
       {isTopLevelPage && <Bin />}
-      <Text fontSize={18} weight='bold'>
+      <Text fontSize={18} weight='bold' style={{ lineHeight: 24 }}>
         {title || 'MEDITRIP'}
       </Text>
       <Bin />

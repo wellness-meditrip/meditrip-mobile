@@ -41,12 +41,27 @@
         const deepLink = `meditrip-mobile://auth?code=${code}&state=${state || ''}`;
         console.log('Redirecting to:', deepLink);
 
-        // 딥링크로 리디렉션
-        window.location.href = deepLink;
+        // 딥링크로 리디렉션 시도
+        try {
+          window.location.href = deepLink;
+
+          // 3초 후에도 앱이 열리지 않으면 브라우저 닫기 시도
+          setTimeout(() => {
+            window.close();
+          }, 3000);
+        } catch (error) {
+          console.error('Deep link failed:', error);
+          window.close();
+        }
       } else {
         // 인증 코드가 없으면 에러 처리
         console.error('No code received');
         window.location.href = 'meditrip-mobile://auth?error=no_code';
+
+        // 3초 후 브라우저 닫기
+        setTimeout(() => {
+          window.close();
+        }, 3000);
       }
     </script>
   </body>

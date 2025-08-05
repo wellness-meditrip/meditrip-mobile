@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   DarkTheme,
   DefaultTheme,
@@ -14,6 +15,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { queryClient } from '../shared/config';
+import { api } from '../shared/config/api-client';
 
 // 앱 시작 시 인증 세션 정리
 WebBrowser.maybeCompleteAuthSession();
@@ -33,6 +35,22 @@ export default function RootLayout() {
     'Pretendard-Black': require('../../assets/fonts/Pretendard-Black.otf'),
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  // 앱 시작 시 저장된 토큰 불러오기
+  React.useEffect(() => {
+    const loadToken = async () => {
+      try {
+        const token = await api.loadAuthToken();
+        if (token) {
+          console.log('🔑 앱 시작 시 저장된 토큰을 불러왔습니다');
+        }
+      } catch (error) {
+        console.error('❌ 토큰 불러오기 실패:', error);
+      }
+    };
+
+    loadToken();
+  }, []);
 
   if (!loaded) {
     // 글꼴 로딩 중에는 스플래시 화면 유지

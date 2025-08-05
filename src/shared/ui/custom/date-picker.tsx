@@ -147,6 +147,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </View>
             <Calendar
               onDayPress={handleDateSelect}
+              initialDate={tempSelectedDate || '2000-12-20'}
               markedDates={
                 tempSelectedDate
                   ? {

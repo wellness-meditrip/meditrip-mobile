@@ -17,7 +17,8 @@ const createRedirectUri = (provider: 'google' | 'line') => {
   if (provider === 'line') {
     // LINE은 HTTPS URL만 지원하므로 고정된 HTTPS URL 사용
     // 실제 배포된 Vercel URL 사용
-    const lineRedirectUri = 'https://meditrip-mobile.vercel.app/auth-callback';
+    const lineRedirectUri =
+      'https://meditrip-mobile-9jb9y9kjd-lumpenops-projects.vercel.app/auth-callback';
     console.log('LINE Redirect URI:', lineRedirectUri);
     return lineRedirectUri;
   }
@@ -145,6 +146,7 @@ export const signInWithLine = async (): Promise<AuthResult> => {
       {
         showInRecents: Platform.OS === 'ios',
         createTask: Platform.OS === 'android',
+        preferEphemeralSession: true, // 임시 세션 사용
       }
     );
 
@@ -152,6 +154,12 @@ export const signInWithLine = async (): Promise<AuthResult> => {
 
     // 인증 세션 수동 종료
     WebBrowser.maybeCompleteAuthSession();
+
+    // 결과 타입별 처리
+    console.log('Result type:', result.type);
+    if ('url' in result) {
+      console.log('Result URL:', result.url);
+    }
 
     if (result.type === 'success' && result.url) {
       // URL에서 인증 코드 추출

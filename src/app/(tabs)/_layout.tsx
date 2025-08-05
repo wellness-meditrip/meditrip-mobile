@@ -9,8 +9,6 @@ import Header from '@/src/widgets/header';
 import {
   HOME,
   HOME_COLOR,
-  CLINICS,
-  CLINICS_COLOR,
   MY_PAGE,
   MY_PAGE_COLOR,
 } from '@/assets/icons/components';
@@ -71,12 +69,15 @@ export default function TabLayout() {
           options={{
             title: 'Clinics',
             headerShown: false,
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <CLINICS_COLOR width={scale(26)} height={scale(26)} />
-              ) : (
-                <CLINICS width={scale(26)} height={scale(26)} />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                name='ic-clinic-list'
+                size={scale(26)}
+                color={
+                  focused ? ColorPalette.primaryColor50 : ColorPalette.primary
+                }
+              />
+            ),
             tabBarLabel: 'Clinics',
             tabBarLabelStyle: {
               fontSize: scale(12),
@@ -87,12 +88,15 @@ export default function TabLayout() {
           name='my-page'
           options={{
             title: 'My Page',
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <MY_PAGE_COLOR width={scale(26)} height={scale(26)} />
-              ) : (
-                <MY_PAGE width={scale(26)} height={scale(26)} />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Icon
+                name='ic-mypage'
+                size={scale(26)}
+                color={
+                  focused ? ColorPalette.primaryColor50 : ColorPalette.primary
+                }
+              />
+            ),
             tabBarLabel: 'My Page',
             tabBarLabelStyle: {
               fontSize: scale(12),

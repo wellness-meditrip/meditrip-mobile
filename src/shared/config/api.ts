@@ -1,7 +1,7 @@
 // API 기본 설정
 export const API_CONFIG = {
   // 개발 환경에서는 로컬 서버 사용, 프로덕션에서는 Azure 서버 사용
-  BASE_URL: 'https://wellness-meditrip-backend.eastus2.cloudapp.azure.com:8010', // 프로덕션 서버
+  BASE_URL: 'https://wellness-meditrip-backend.eastus2.cloudapp.azure.com:8013', // 프로덕션 서버
   TIMEOUT: 10000, // 10초
   HEADERS: {
     'Content-Type': 'application/json',
@@ -13,8 +13,8 @@ export const API_CONFIG = {
 export const API_ENDPOINTS = {
   // 인증 관련
   AUTH: {
-    LOGIN: '/auth/login',
-    SIGNUP: '/auth/signup',
+    LOGIN: '/auth/email/login',
+    SIGNUP: '/auth/email/register',
     REFRESH: '/auth/refresh',
   },
 
@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   USER: {
     PROFILE: '/user/profile',
     UPDATE_PROFILE: '/user/profile',
+    CREATE_PROFILE: '/profile/create',
   },
 
   // 클리닉 관련

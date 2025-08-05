@@ -5,6 +5,7 @@ import axios, {
   CancelTokenSource,
   isCancel,
 } from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_CONFIG, API_ENDPOINTS, ApiResponse, ApiError } from './api';
 
 // API 클라이언트 클래스
@@ -34,6 +35,8 @@ class ApiClient {
             config.method?.toUpperCase(),
             config.url
           );
+          console.log('📤 요청 헤더:', config.headers);
+          console.log('📤 요청 데이터:', config.data);
         }
         return config;
       },
@@ -48,13 +51,24 @@ class ApiClient {
         // 응답 로깅 (개발 환경에서만)
         if (__DEV__) {
           console.log('✅ API Response:', response.status, response.config.url);
+          console.log('📡 응답 헤더:', response.headers);
+          console.log('📡 응답 데이터:', response.data);
         }
         return response;
       },
       error => {
         // 에러 로깅 (개발 환경에서만)
         if (__DEV__) {
-          console.log('❌ API Error:', error.response, error.config?.url);
+          console.log(
+            '❌ API Error:',
+            error.response?.status,
+            error.config?.url
+          );
+          console.log('❌ 에러 응답:', error.response?.data);
+          console.log('❌ 에러 메시지:', error.message);
+          console.log('❌ 요청 URL:', error.config?.url);
+          console.log('❌ 요청 메서드:', error.config?.method);
+          console.log('❌ 요청 데이터:', error.config?.data);
         }
 
         // 401 에러 처리 (토큰 만료)
@@ -69,14 +83,48 @@ class ApiClient {
   }
 
   // 토큰 설정
-  setAuthToken(token: string) {
+  async setAuthToken(token: string) {
+    // 헤더에 토큰 설정
     this.axiosInstance.defaults.headers.common['Authorization'] =
       `Bearer ${token}`;
+
+    // AsyncStorage에 토큰 저장
+    try {
+      await AsyncStorage.setItem('auth_token', token);
+    } catch (error) {
+      console.error('❌ 토큰 저장 실패:', error);
+    }
   }
 
   // 토큰 제거
-  removeAuthToken() {
+  async removeAuthToken() {
+    // 헤더에서 토큰 제거
     delete this.axiosInstance.defaults.headers.common['Authorization'];
+
+    // AsyncStorage에서 토큰 제거
+    try {
+      await AsyncStorage.removeItem('auth_token');
+    } catch (error) {
+      console.error('❌ 토큰 제거 실패:', error);
+    }
+  }
+
+  // 저장된 토큰 불러오기
+  async loadAuthToken(): Promise<string | null> {
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+
+      if (token) {
+        // 헤더에 토큰 설정
+        this.axiosInstance.defaults.headers.common['Authorization'] =
+          `Bearer ${token}`;
+        return token;
+      }
+      return null;
+    } catch (error) {
+      console.error('❌ 토큰 불러오기 실패:', error);
+      return null;
+    }
   }
 
   // 헤더 설정
@@ -338,6 +386,7 @@ export const api = {
 
   setAuthToken: (token: string) => apiClient.setAuthToken(token),
   removeAuthToken: () => apiClient.removeAuthToken(),
+  loadAuthToken: () => apiClient.loadAuthToken(),
   setHeaders: (headers: Record<string, string>) =>
     apiClient.setHeaders(headers),
   cancelRequest: (requestId: string) => apiClient.cancelRequest(requestId),

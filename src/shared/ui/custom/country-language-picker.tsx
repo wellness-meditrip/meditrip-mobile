@@ -5,7 +5,7 @@ import NativePicker from './native-picker';
 interface CountryLanguagePickerProps {
   selectedCountry?: string;
   selectedLanguage?: string;
-  onCountrySelect: (country: string) => void;
+  onCountrySelect: (country: string, countryId?: number) => void;
   onLanguageSelect: (language: string) => void;
   containerStyle?: any;
 }
@@ -18,9 +18,9 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
   containerStyle,
 }) => {
   const countries = [
-    { id: 'KR', name: '한국', code: 'KR' },
-    { id: 'JP', name: '일본', code: 'JP' },
-    { id: 'US', name: '미국', code: 'US' },
+    { id: 1, name: '한국', code: 'KR' },
+    { id: 2, name: '일본', code: 'JP' },
+    { id: 3, name: '미국', code: 'US' },
   ];
 
   const languages = [
@@ -29,6 +29,13 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
     { id: 'EN', name: 'English', code: 'EN' },
   ];
 
+  const handleCountrySelect = (countryName: string) => {
+    const selectedCountryData = countries.find(
+      country => country.name === countryName
+    );
+    onCountrySelect(countryName, selectedCountryData?.id);
+  };
+
   return (
     <View style={[styles.container, containerStyle]}>
       <NativePicker
@@ -36,7 +43,7 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
         placeholder='국가를 선택'
         options={countries}
         selectedValue={selectedCountry}
-        onSelect={onCountrySelect}
+        onSelect={handleCountrySelect}
       />
 
       <NativePicker

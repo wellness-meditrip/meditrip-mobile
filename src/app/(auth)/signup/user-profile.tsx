@@ -11,15 +11,19 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { DatePicker } from '@/src/shared/ui/custom';
+import { useCreateProfile } from '@/src/shared/config/api-hooks';
 
 const UserProfile = () => {
+  // API 훅
+  const createProfileMutation = useCreateProfile();
+
   // 관심 건강 주제 상태
   const [selectedHealthTopics, setSelectedHealthTopics] = useState<string[]>(
     []
   );
 
   // 성별과 나이 상태
-  const [selectedGender, setSelectedGender] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<string>('none');
   const [birthDate, setBirthDate] = useState('');
 
   // 키와 몸무게 상태
@@ -57,33 +61,80 @@ const UserProfile = () => {
   };
 
   // 저장 버튼 처리
-  const handleSave = () => {
-    if (selectedHealthTopics.length === 0) {
-      Alert.alert('오류', '관심 건강 주제를 하나 이상 선택해주세요.');
-      return;
-    }
+  const handleSave = async () => {
+    // UI에서 이미 버튼이 비활성화되므로 추가 검증은 불필요
+    try {
+      // 날짜 형식을 YYYY-MM-DD로 변환
+      const formattedBirthDate = birthDate
+        ? birthDate.replace(/\./g, '-')
+        : undefined;
 
-    if (!selectedGender) {
-      Alert.alert('오류', '성별을 선택해주세요.');
-      return;
-    }
+      // 키와 몸무게를 숫자로 변환
+      const heightNumber = parseFloat(height);
+      const weightNumber = parseFloat(weight);
 
-    if (!birthDate) {
-      Alert.alert('오류', '생년월일을 입력해주세요.');
-      return;
-    }
+      const profileData = {
+        gender:
+          selectedGender === 'none'
+            ? undefined
+            : (selectedGender as 'male' | 'female'),
+        birthdate: formattedBirthDate,
+        height: heightNumber || undefined,
+        weight: weightNumber || undefined,
+        topics_of_interest: selectedHealthTopics,
+      };
 
-    // TODO: 실제 데이터 저장 로직 구현
-    Alert.alert('저장 완료', '프로필 정보가 저장되었습니다!', [
-      {
-        text: '확인',
-        onPress: () => {
-          // 홈 화면으로 이동
-          router.replace('/(tabs)/home');
-        },
-      },
-    ]);
+      const result = await createProfileMutation.mutateAsync(profileData);
+
+      if (result.success) {
+        Alert.alert(
+          '성공',
+          result.message || '프로필이 성공적으로 생성되었습니다!',
+          [
+            {
+              text: '확인',
+              onPress: () => {
+                // 홈 화면으로 이동
+                router.replace('/(tabs)/home');
+              },
+            },
+          ]
+        );
+      } else {
+        // API 응답에서 에러 메시지를 찾는 로직
+        let errorMessage = '프로필 생성에 실패했습니다.';
+        if (result.error) {
+          errorMessage = result.error;
+        } else if (result.message) {
+          errorMessage = result.message;
+        }
+
+        // 토큰 관련 에러인 경우 로그인 화면으로 이동
+        if (errorMessage.includes('토큰') || errorMessage.includes('인증')) {
+          Alert.alert('인증 오류', errorMessage, [
+            {
+              text: '로그인으로 이동',
+              onPress: () => {
+                router.replace('/(auth)/login');
+              },
+            },
+          ]);
+        } else {
+          Alert.alert('오류', errorMessage);
+        }
+      }
+    } catch (error: any) {
+      console.error('프로필 생성 중 오류 발생:', error);
+      Alert.alert(
+        '오류',
+        error?.message || '프로필 생성 중 문제가 발생했습니다.'
+      );
+    }
   };
+
+  // 저장 버튼 활성화 조건
+  const isSaveButtonEnabled =
+    selectedHealthTopics.length > 0 && !createProfileMutation.isPending;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -92,8 +143,10 @@ const UserProfile = () => {
           {/* 1. 관심 건강 주제 섹션 */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              관심 건강 주제를 선택해주세요. *
+              관심 건강 주제를 선택해주세요.{' '}
+              <Text style={styles.required}>*</Text>
             </Text>
+            <Text style={styles.sectionSubtitle}>하나 이상 선택해주세요</Text>
             <View style={styles.healthTopicsContainer}>
               {healthTopics.map(topic => (
                 <TouchableOpacity
@@ -126,6 +179,11 @@ const UserProfile = () => {
                 </TouchableOpacity>
               ))}
             </View>
+            {selectedHealthTopics.length === 0 && (
+              <Text style={styles.errorText}>
+                관심 건강 주제를 하나 이상 선택해주세요.
+              </Text>
+            )}
           </View>
 
           {/* 2. 성별과 나이 섹션 */}
@@ -174,7 +232,7 @@ const UserProfile = () => {
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>생년월일</Text>
               <DatePicker
-                placeholder='2000.12.20'
+                placeholder='날짜를 선택해주세요'
                 selectedDate={birthDate}
                 onChange={setBirthDate}
                 style={styles.datePicker}
@@ -212,8 +270,17 @@ const UserProfile = () => {
           </View>
 
           {/* 저장 버튼 */}
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>저장하기</Text>
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              !isSaveButtonEnabled && styles.saveButtonDisabled,
+            ]}
+            onPress={handleSave}
+            disabled={!isSaveButtonEnabled}
+          >
+            <Text style={styles.saveButtonText}>
+              {createProfileMutation.isPending ? '저장 중...' : '저장하기'}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -238,7 +305,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
@@ -246,8 +313,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: '#333',
   },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  required: {
+    color: 'red',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 8,
+  },
   subSection: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   subSectionLabel: {
     fontSize: 16,
@@ -330,11 +410,14 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
   },
 });

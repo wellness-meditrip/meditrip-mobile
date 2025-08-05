@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,9 +18,60 @@ import { ColorPalette } from '@/constants/Colors';
 import { scale } from '../../../shared/lib';
 import { Icon } from '../../../../components/icons';
 
+// 언어별 텍스트 정의
+const LANGUAGE_TEXTS = {
+  KO: {
+    categoryTitle: '진료 카테고리를 선택해보세요',
+    dateTitle: '방문 날짜를 선택하세요',
+    datePlaceholder: '방문 날짜를 선택하세요',
+    searchButton: '찾기',
+    recommendedTitle: '추천 병원',
+  },
+  JP: {
+    categoryTitle: '診療カテゴリーを選択してください',
+    dateTitle: '訪問日を選択してください',
+    datePlaceholder: '訪問日を選択してください',
+    searchButton: '検索',
+    recommendedTitle: 'おすすめ病院',
+  },
+  EN: {
+    categoryTitle: 'Select a treatment category',
+    dateTitle: 'Select your visit date',
+    datePlaceholder: 'Select your visit date',
+    searchButton: 'Search',
+    recommendedTitle: 'Recommended Clinics',
+  },
+};
+
 export default function HomeScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [currentLanguage, setCurrentLanguage] = useState('KO'); // 기본값은 한국어
+  const [texts, setTexts] = useState(LANGUAGE_TEXTS.KO);
+
+  // 저장된 언어 확인 및 설정
+  useEffect(() => {
+    const loadSavedLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('selectedLanguage');
+        if (savedLanguage) {
+          setCurrentLanguage(savedLanguage);
+          setTexts(
+            LANGUAGE_TEXTS[savedLanguage as keyof typeof LANGUAGE_TEXTS] ||
+              LANGUAGE_TEXTS.KO
+          );
+          console.log('저장된 언어를 불러왔습니다:', savedLanguage);
+        } else {
+          console.log('저장된 언어가 없어 기본값(한국어)을 사용합니다.');
+        }
+      } catch (error) {
+        console.error('언어 로드 중 오류 발생:', error);
+        setTexts(LANGUAGE_TEXTS.KO);
+      }
+    };
+
+    loadSavedLanguage();
+  }, []);
 
   const handleCategoryPress = useCallback((categoryId: string) => {
     setSelectedCategories(prev => {
@@ -91,7 +143,7 @@ export default function HomeScreen() {
         />
       </BoxLayout> */}
       <BoxLayout>
-        <Text style={styles.title}>진료 카테고리를 선택해보세요</Text>
+        <Text style={styles.title}>{texts.categoryTitle}</Text>
 
         <View style={styles.categoryContainer}>
           {CATEGORIES.map(renderCategoryButton)}
@@ -99,9 +151,9 @@ export default function HomeScreen() {
       </BoxLayout>
 
       <BoxLayout>
-        <Text style={styles.title}>Select your visit date</Text>
+        <Text style={styles.title}>{texts.dateTitle}</Text>
         <DatePicker
-          placeholder='방문 날짜를 선택하세요'
+          placeholder={texts.datePlaceholder}
           placeholderTextColor={ColorPalette.tertiary}
           selectedDate={selectedDate}
           onChange={handleDateChange}
@@ -113,7 +165,9 @@ export default function HomeScreen() {
           style={styles.button}
           onPress={() => router.push('/home/dashboard')}
         >
-          <ThemedText style={styles.buttonText}>찾기</ThemedText>
+          <ThemedText style={styles.buttonText}>
+            {texts.searchButton}
+          </ThemedText>
         </Button>
       </ThemedView>
       <BoxLayout horizontal={16} backgroundColor={ColorPalette.primaryColor10}>
@@ -121,7 +175,7 @@ export default function HomeScreen() {
           style={styles.recomendedClinicsContainer}
           onPress={() => router.push('/clinics')}
         >
-          <Text style={styles.title}>추천 병원</Text>
+          <Text style={styles.title}>{texts.recommendedTitle}</Text>
           <ARROW_LEFT style={{ transform: [{ rotate: '180deg' }] }} />
         </TouchableOpacity>
         <View style={styles.recommendedClinicsBackground}>

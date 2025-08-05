@@ -11,7 +11,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface PickerOption {
-  id: string;
+  id: string | number;
   name: string;
   code?: string;
 }
