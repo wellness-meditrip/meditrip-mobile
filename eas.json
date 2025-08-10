@@ -18,11 +18,6 @@
       "channel": "production"
     }
   },
-  "update": {
-    "preview": {
-      "channel": "preview"
-    }
-  },
   "submit": {
     "production": {}
   }
