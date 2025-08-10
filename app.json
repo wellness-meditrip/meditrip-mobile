@@ -67,7 +67,7 @@
       "LINE_REDIRECT_URI": "https://auth.expo.io/@lumpenop/meditrip-mobile"
     },
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "sdkVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/e6be1d01-0f5e-404a-8bdb-96a38f907ef6"
