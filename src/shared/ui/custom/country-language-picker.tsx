@@ -5,7 +5,7 @@ import NativePicker from './native-picker';
 interface CountryLanguagePickerProps {
   selectedCountry?: string;
   selectedLanguage?: string;
-  onCountrySelect: (country: string) => void;
+  onCountrySelect: (country: string, countryId?: number) => void;
   onLanguageSelect: (language: string) => void;
   containerStyle?: any;
 }
@@ -18,9 +18,9 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
   containerStyle,
 }) => {
   const countries = [
-    { id: 'KR', name: '한국', code: 'KR' },
-    { id: 'JP', name: '일본', code: 'JP' },
-    { id: 'US', name: '미국', code: 'US' },
+    { id: 1, name: 'South Korea', code: 'KR' },
+    { id: 2, name: 'Japan', code: 'JP' },
+    { id: 3, name: 'United States', code: 'US' },
   ];
 
   const languages = [
@@ -29,6 +29,19 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
     { id: 'EN', name: 'English', code: 'EN' },
   ];
 
+  // 언어 코드를 언어명으로 변환하는 함수
+  const getLanguageName = (languageCode: string): string => {
+    const language = languages.find(lang => lang.code === languageCode);
+    return language?.name || languageCode;
+  };
+
+  const handleCountrySelect = (countryName: string) => {
+    const selectedCountryData = countries.find(
+      country => country.name === countryName
+    );
+    onCountrySelect(countryName, selectedCountryData?.id);
+  };
+
   return (
     <View style={[styles.container, containerStyle]}>
       <NativePicker
@@ -36,16 +49,22 @@ const CountryLanguagePicker: React.FC<CountryLanguagePickerProps> = ({
         placeholder='국가를 선택'
         options={countries}
         selectedValue={selectedCountry}
-        onSelect={onCountrySelect}
+        onSelect={handleCountrySelect}
       />
 
-      <NativePicker
+      {/* <NativePicker
         label='언어'
         placeholder='언어를 선택'
         options={languages}
-        selectedValue={selectedLanguage}
-        onSelect={onLanguageSelect}
-      />
+        selectedValue={getLanguageName(selectedLanguage || '')}
+        onSelect={languageName => {
+          // 언어명을 언어 코드로 변환
+          const language = languages.find(lang => lang.name === languageName);
+          if (language) {
+            onLanguageSelect(language.code);
+          }
+        }}
+      /> */}
     </View>
   );
 };

@@ -6,20 +6,18 @@ import {
   ViewStyle,
 } from 'react-native';
 import Text from './text';
-import { ScaledStyleProps, applyScaledStyles } from './types';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-interface ButtonProps extends TouchableOpacityProps, ScaledStyleProps {
+interface ButtonProps extends TouchableOpacityProps {
+  backgroundColor?: 'primary' | 'secondary' | 'outline' | 'ghost';
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'small' | 'medium' | 'large';
   disabled?: boolean;
   children?: React.ReactNode;
   style?: ViewStyle;
 }
 
 const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  size = 'medium',
+  variant = 'ghost',
   disabled = false,
   children,
   style,
@@ -91,19 +89,12 @@ const Button: React.FC<ButtonProps> = ({
     }
   };
 
-  // scale 적용된 스타일
-  const scaledStyle = applyScaledStyles(props);
-
   const buttonStyle = [
-    styles.base,
-    styles[variant],
-    styles[size],
     {
       backgroundColor: getBackgroundColor(),
       borderColor: getBorderColor(),
     },
     disabled && styles.disabled,
-    scaledStyle,
     style,
   ];
 
@@ -116,7 +107,7 @@ const Button: React.FC<ButtonProps> = ({
     >
       {typeof children === 'string' ? (
         <Text
-          variant='body'
+          variant='button-m'
           weight='semibold'
           color={getTextColor()}
           align='center'
@@ -131,23 +122,8 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  base: {
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Variants
-  primary: {
-    // backgroundColor는 동적으로 적용
-  },
-  secondary: {
-    // backgroundColor는 동적으로 적용
-  },
-  outline: {
-    // backgroundColor는 동적으로 적용
-  },
-  ghost: {
-    // backgroundColor는 동적으로 적용
+  disabled: {
+    opacity: 0.5,
   },
 });
 

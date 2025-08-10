@@ -3,9 +3,11 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ColorPalette } from '@/constants/Colors';
+import { Icon, IconName } from '../../../components/icons';
+import { scale } from '../lib/scale-utils';
 
 interface CategoryButtonProps {
-  icon: React.ReactNode;
+  icon: IconName;
   label: string;
   isSelected?: boolean;
   onPress?: () => void;
@@ -49,9 +51,15 @@ export const CategoryButton = React.memo<CategoryButtonProps>(
               ],
             ]}
           >
-            {icon}
+            <Icon name={icon} size={scale(24)} color={ColorPalette.tertiary} />
           </ThemedView>
-          <ThemedText style={[styles.label, disabled && styles.disabledLabel]}>
+          <ThemedText
+            style={[
+              styles.label,
+              disabled && styles.disabledLabel,
+              isSelected && { color: ColorPalette.tertiary },
+            ]}
+          >
             {label}
           </ThemedText>
         </ThemedView>
@@ -62,14 +70,14 @@ export const CategoryButton = React.memo<CategoryButtonProps>(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginHorizontal: 2,
+    // flex: 1 제거하여 space-between이 제대로 작동하도록 함
   },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    minHeight: 80,
+    width: scale(64),
+    height: scale(64),
   },
   defaultButton: {
     backgroundColor: 'white',
@@ -87,12 +95,11 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
     borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
+    paddingBottom: 8,
   },
   selectedIconContainer: {
     backgroundColor: '#E3F2FD',
@@ -101,8 +108,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     textAlign: 'center',
+    color: ColorPalette.tertiary,
   },
   disabledLabel: {
-    color: '#999',
+    color: ColorPalette.primary,
   },
 });

@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { View, Text, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+
+// 딥링크 처리 시 인증 세션 정리
+WebBrowser.maybeCompleteAuthSession();
 
 export default function DeepLinkHandler() {
   const router = useRouter();

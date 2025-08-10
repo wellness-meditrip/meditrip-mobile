@@ -1,11 +1,15 @@
-import { ARROW_LEFT } from '@/assets/icons/components/header';
 import { scale, useSafeRouter } from '@/src/shared/lib';
 import { Button, Text, View } from '@/src/shared/ui/custom';
+import { Icon } from '@/components/icons';
 import { usePathname } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-const Header = () => {
+interface HeaderProps {
+  title?: string;
+}
+
+const Header = ({ title }: HeaderProps) => {
   const safeRouter = useSafeRouter();
   const pathname = usePathname();
 
@@ -25,13 +29,13 @@ const Header = () => {
       {!isTopLevelPage && (
         <Button onPress={handleGoBack}>
           <View>
-            <ARROW_LEFT width={scale(24)} height={scale(24)} />
+            <Icon name='ic-chevron-left' size={scale(24)} color='#000000' />
           </View>
         </Button>
       )}
       {isTopLevelPage && <Bin />}
-      <Text fontSize={18} weight='bold'>
-        MEDITRIP
+      <Text fontSize={18} weight='bold' style={{ lineHeight: 24 }}>
+        {title || 'MEDITRIP'}
       </Text>
       <Bin />
     </View>

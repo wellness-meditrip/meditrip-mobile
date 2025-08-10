@@ -18,6 +18,7 @@ interface InputProps extends Omit<TextInputProps, 'style'>, ScaledStyleProps {
   onChangeText?: (text: string) => void;
   placeholder?: string;
   style?: any;
+  disabled?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -26,6 +27,7 @@ const Input: React.FC<InputProps> = ({
   helper,
   leftIcon,
   rightIcon,
+  disabled,
   onRightIconPress,
   variant = 'outlined',
   style,
@@ -74,7 +76,7 @@ const Input: React.FC<InputProps> = ({
     <View>
       {label && (
         <Text
-          variant='label'
+          variant='title-s'
           weight='medium'
           style={[styles.label, { color: labelColor }]}
         >
@@ -96,15 +98,13 @@ const Input: React.FC<InputProps> = ({
             style={
               [
                 styles.rightIcon,
-                props.value && props.value.length > 0
+                props.value && props.value.length > 0 && !disabled
                   ? styles.rightIconEnabled
                   : styles.rightIconDisabled,
               ] as any
             }
             onPress={onRightIconPress}
-            disabled={
-              !props.value || props.value.length === 0 || !onRightIconPress
-            }
+            disabled={disabled || !onRightIconPress}
           >
             {rightIcon}
           </Button>
@@ -113,7 +113,7 @@ const Input: React.FC<InputProps> = ({
 
       {(error || helper) && (
         <Text
-          variant='caption'
+          variant='body-s'
           color={error ? errorColor : helperColor}
           style={styles.helper}
         >

@@ -3,30 +3,29 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { scale } from '../../lib/scale-utils';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { CALENDAR } from '@/assets/icons/main';
 import { ColorPalette } from '@/constants/Colors';
+import { Icon } from '../../../../components/icons';
 
 interface DatePickerProps {
   placeholder?: string;
   selectedDate?: string;
   onChange?: (date: string) => void;
   style?: any;
+  placeholderTextColor?: string;
 }
-
-const CalendarIcon = ({ width, height }: { width: number; height: number }) => (
-  <CALENDAR width={width} height={height} />
-);
 
 export const DatePicker: React.FC<DatePickerProps> = ({
   placeholder = '날짜를 선택하세요',
   selectedDate,
   onChange,
   style,
+  placeholderTextColor,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [tempSelectedDate, setTempSelectedDate] = useState<string | undefined>(
     selectedDate
   );
+  console.log(selectedDate);
 
   // 다크모드 색상 적용
   const backgroundColor = useThemeColor({}, 'background');
@@ -106,12 +105,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <Text
           style={[
             styles.dateText,
-            { color: selectedDate ? textColor : placeholderColor },
+            {
+              color: selectedDate ? textColor : placeholderTextColor,
+            },
           ]}
         >
           {selectedDate ? formatDisplayDate(selectedDate) : placeholder}
         </Text>
-        <CalendarIcon width={20} height={20} />
+        <Icon
+          name='ic-calendar'
+          size={scale(20)}
+          color={placeholderTextColor}
+        />
       </TouchableOpacity>
 
       <Modal
@@ -143,6 +148,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </View>
             <Calendar
               onDayPress={handleDateSelect}
+              initialDate={tempSelectedDate || '2000-12-20'}
               markedDates={
                 tempSelectedDate
                   ? {
@@ -163,6 +169,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 arrowColor: textColor,
                 monthTextColor: textColor,
                 indicatorColor: textColor,
+                textSectionTitleColor: textColor,
                 textDayFontWeight: '300',
                 textMonthFontWeight: 'bold',
                 textDayHeaderFontWeight: '300',

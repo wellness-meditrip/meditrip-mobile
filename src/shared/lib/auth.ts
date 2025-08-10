@@ -1,4 +1,5 @@
 import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
@@ -8,12 +9,39 @@ const GOOGLE_CLIENT_ID =
   '397287998102-o0gei5mtv0l86lf12hcqg5lo0mtsim3e.apps.googleusercontent.com';
 const LINE_CHANNEL_ID = '2007839926';
 
+// 앱 시작 시 인증 세션 정리
+WebBrowser.maybeCompleteAuthSession();
+
+// AuthSession을 사용한 올바른 리디렉션 URI 생성
+const createRedirectUri = (provider: 'google' | 'line') => {
+  if (provider === 'line') {
+    // LINE은 HTTPS URL만 지원하므로 고정된 HTTPS URL 사용
+    // 실제 배포된 Vercel URL 사용
+    const lineRedirectUri =
+      'https://meditrip-mobile-9jb9y9kjd-lumpenops-projects.vercel.app/auth-callback';
+    console.log('LINE Redirect URI:', lineRedirectUri);
+    return lineRedirectUri;
+  }
+
+  // Google은 네이티브 스키마도 지원
+  const nativeRedirectUri = AuthSession.makeRedirectUri({
+    native: 'meditrip-mobile://auth',
+  });
+
+  const webRedirectUri = AuthSession.makeRedirectUri({
+    scheme: 'meditrip-mobile',
+  });
+
+  console.log(`${provider} Native Redirect URI:`, nativeRedirectUri);
+  console.log(`${provider} Web Redirect URI:`, webRedirectUri);
+
+  // 개발 환경에서는 웹 URI, 프로덕션에서는 네이티브 URI 사용
+  return __DEV__ ? webRedirectUri : nativeRedirectUri;
+};
+
 // 딥링크 URI 확인
 const DEEP_LINK_URI = Linking.createURL('/auth');
 console.log('Deep Link URI:', DEEP_LINK_URI);
-
-// 개발용 리디렉트 URI (실제 배포 시에는 도메인 필요)
-const REDIRECT_URI = 'https://meditrip-mobile.vercel.app/';
 
 interface AuthResult {
   success: boolean;
@@ -26,11 +54,13 @@ export const signInWithGoogle = async (): Promise<AuthResult> => {
   try {
     console.log('Starting Google OAuth...');
 
+    const redirectUri = createRedirectUri('google');
+
     // 실제 OAuth URL 생성
     const googleAuthUrl =
       `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${GOOGLE_CLIENT_ID}&` +
-      `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `response_type=code&` +
       `scope=${encodeURIComponent('openid email profile')}&` +
       `access_type=offline`;
@@ -40,7 +70,7 @@ export const signInWithGoogle = async (): Promise<AuthResult> => {
     // 웹브라우저로 인증 시작 (안드로이드 호환)
     const result = await WebBrowser.openAuthSessionAsync(
       googleAuthUrl,
-      REDIRECT_URI,
+      redirectUri,
       {
         showInRecents: Platform.OS === 'ios',
         createTask: Platform.OS === 'android',
@@ -94,28 +124,42 @@ export const signInWithLine = async (): Promise<AuthResult> => {
   try {
     console.log('Starting LINE OAuth...');
 
-    // 실제 라인 OAuth URL 생성 (웹 URL 사용)
+    const redirectUri = createRedirectUri('line');
+    console.log('Using redirect URI:', redirectUri);
+
+    // 실제 라인 OAuth URL 생성
     const lineAuthUrl =
       `https://access.line.me/oauth2/v2.1/authorize?` +
       `response_type=code&` +
       `client_id=${LINE_CHANNEL_ID}&` +
-      `redirect_uri=${encodeURIComponent('https://meditrip-mobile.vercel.app/auth-callback')}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `state=random_state_string&` +
       `scope=profile%20openid%20email`;
 
     console.log('LINE OAuth URL:', lineAuthUrl);
+    console.log('LINE Channel ID:', LINE_CHANNEL_ID);
 
-    // 웹브라우저로 인증 시작 (웹 URL 사용)
+    // 웹브라우저로 인증 시작
     const result = await WebBrowser.openAuthSessionAsync(
       lineAuthUrl,
-      'https://meditrip-mobile.vercel.app/auth-callback',
+      redirectUri,
       {
         showInRecents: Platform.OS === 'ios',
         createTask: Platform.OS === 'android',
+        preferEphemeralSession: true, // 임시 세션 사용
       }
     );
 
     console.log('LINE OAuth result:', result);
+
+    // 인증 세션 수동 종료
+    WebBrowser.maybeCompleteAuthSession();
+
+    // 결과 타입별 처리
+    console.log('Result type:', result.type);
+    if ('url' in result) {
+      console.log('Result URL:', result.url);
+    }
 
     if (result.type === 'success' && result.url) {
       // URL에서 인증 코드 추출
