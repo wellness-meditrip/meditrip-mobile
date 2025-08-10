@@ -85,7 +85,6 @@ const renderStars = (rating: number) => '★'.repeat(rating);
 // 컴포넌트들
 const ProfileSection = ({ safeRouter }: { safeRouter: SafeRouterHandler }) => {
   const [user] = useAtom(userAtom);
-  const [isLoggedIn] = useAtom(isLoggedInAtom);
 
   // 사용자 정보
   const displayName = user?.displayName || user?.nickname || '사용자';
@@ -140,7 +139,7 @@ const ReservationSection = ({
 }: {
   safeRouter: SafeRouterHandler;
 }) => {
-  const [user] = useAtom(userAtom);
+  // const [user] = useAtom(userAtom);
   const { data, isLoading, error } = useGetReservationList(0);
 
   // API 데이터를 UI용으로 변환하는 함수
@@ -218,7 +217,7 @@ const ReservationSection = ({
 
   // 표시할 예약 데이터 (API 데이터가 있으면 사용, 없으면 빈 배열)
   const displayReservations = data?.data?.items
-    ? data.data.items.map(transformReservationData).slice(0, 3)
+    ? data.data.items.map(transformReservationData).slice(0, 2)
     : [];
 
   return (

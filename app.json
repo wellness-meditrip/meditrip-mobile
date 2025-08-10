@@ -11,7 +11,18 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.meditrip.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "meditrip-web-eta.vercel.app": {
+              "NSExceptionAllowsInsecureHTTPLoads": false,
+              "NSExceptionMinimumTLSVersion": "TLSv1.2",
+              "NSExceptionRequiresForwardSecrecy": true,
+              "NSIncludesSubdomains": true
+            }
+          }
+        }
       },
       "associatedDomains": ["applinks:meditrip-mobile.vercel.app"]
     },
@@ -22,6 +33,10 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.meditrip.app",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",

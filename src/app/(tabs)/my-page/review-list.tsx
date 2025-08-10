@@ -166,11 +166,9 @@ const transformApiDataToUI = async (
   // 이미지 URL 처리
   let imageUrls: string[] = [];
   if (apiData.images && apiData.images.length > 0) {
-    console.log('이미지 데이터:', JSON.stringify(apiData.images, null, 2));
     imageUrls = apiData.images
       .map(image => {
         try {
-          console.log('개별 이미지 데이터:', image, typeof image);
           // API 응답 구조에 따라 이미지 URL 처리
           if (typeof image === 'string' && image) {
             // 이미지가 문자열인 경우 (base64 또는 URL)
@@ -220,7 +218,6 @@ const transformApiDataToUI = async (
           }
           return null;
         } catch (error) {
-          console.error('이미지 처리 중 오류:', error, image);
           return null;
         }
       })
@@ -375,7 +372,6 @@ const ReviewList = () => {
   React.useEffect(() => {
     const processReviews = async () => {
       if (data?.items) {
-        console.log('API 응답 데이터:', JSON.stringify(data.items, null, 2));
         const processedReviews = await Promise.all(
           data.items.map(transformApiDataToUI)
         );

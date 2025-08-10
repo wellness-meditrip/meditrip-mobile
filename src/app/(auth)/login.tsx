@@ -246,7 +246,7 @@ const Login = () => {
         setIsLoggedIn(true);
         await saveLoginState(true);
 
-        Alert.alert('성공', result.message || '로그인되었습니다.');
+        Alert.alert('성공', '로그인이 완료되었습니다.');
         router.replace('/(tabs)/home');
       } else {
         // API 응답에서 에러 메시지를 찾는 로직

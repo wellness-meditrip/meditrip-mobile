@@ -13,12 +13,13 @@ import { BoxLayout } from '@/src/shared/ui/box-layout';
 
 import ReviewModal from '@/src/shared/ui/ReviewModal';
 import { useLocalSearchParams } from 'expo-router';
+import { useGetReservationList, Reservation } from '../../../shared/config';
 
-// 예약 상태 타입
-type ReservationStatus = '예약 완료' | '예약 취소' | '방문 완료';
+// 예약 상태 타입 (API 스키마에 맞춤)
+type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
 
-// 예약 데이터 타입
-interface Reservation {
+// UI용 예약 데이터 타입
+interface ReservationUI {
   id: string;
   clinicName: string;
   location: string;
@@ -33,66 +34,6 @@ interface Reservation {
   canViewReview?: boolean;
 }
 
-// 목 데이터
-const MOCK_RESERVATIONS: Reservation[] = [
-  {
-    id: '1',
-    clinicName: '우주연 한의원',
-    location: '서울 종로구',
-    practitioner: '우주연 원장님',
-    treatment: '다이어트 패키지',
-    visitDate: '25.08.02 (토)',
-    visitTime: '오후 14:00',
-    status: '예약 완료',
-  },
-  {
-    id: '2',
-    clinicName: '우주연 한의원',
-    location: '서울 종로구',
-    practitioner: '우주연 원장님',
-    treatment: '다이어트 패키지',
-    visitDate: '25.07.29 (화)',
-    visitTime: '오전 11:00',
-    status: '예약 완료',
-    canBookAgain: true,
-    canCancel: true,
-  },
-  {
-    id: '3',
-    clinicName: '우주연 한의원',
-    location: '서울 종로구',
-    practitioner: '우주연 원장님',
-    treatment: '다이어트 패키지',
-    visitDate: '25.07.17 (목)',
-    visitTime: '오전 10:00',
-    status: '예약 취소',
-  },
-  {
-    id: '4',
-    clinicName: '우주연 한의원',
-    location: '서울 종로구',
-    practitioner: '우주연 원장님',
-    treatment: '다이어트 패키지',
-    visitDate: '25.07.02 (수)',
-    visitTime: '오후 16:00',
-    status: '방문 완료',
-    canBookAgain: true,
-    canWriteReview: true,
-  },
-  {
-    id: '5',
-    clinicName: '우주연 한의원',
-    location: '서울 종로구',
-    practitioner: '우주연 원장님',
-    treatment: '다이어트 패키지',
-    visitDate: '25.07.02 (수)',
-    visitTime: '오후 16:00',
-    status: '방문 완료',
-    canBookAgain: true,
-    canViewReview: true,
-  },
-];
-
 const ReservationList = () => {
   const [sortOrder, setSortOrder] = useState<'최신순' | '오래된순'>('최신순');
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
@@ -100,9 +41,104 @@ const ReservationList = () => {
     string | null
   >(null);
   const { isReviewWrite } = useLocalSearchParams();
+  const { data, isLoading, error } = useGetReservationList(0);
+
+  // API에서 받아온 예약 데이터
+  const reservations = data?.data?.items || [];
+
+  // 테스트용으로 상태를 다양하게 변경 (실제 운영시에는 제거)
+  const modifiedReservations = reservations.map((reservation, index) => {
+    // 첫 번째는 예약 완료, 두 번째는 예약 완료, 세 번째는 예약 취소, 네 번째는 방문 완료, 다섯 번째는 방문 완료
+    const statusMap = [
+      'CONFIRMED',
+      'CONFIRMED',
+      'CANCELLED',
+      'COMPLETED',
+      'COMPLETED',
+    ];
+    const status = statusMap[index] || reservation.status;
+
+    return {
+      ...reservation,
+      status: status as 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED',
+    };
+  });
+
+  // API 데이터를 UI 데이터로 변환하는 함수
+  const transformReservationData = (
+    reservation: Reservation
+  ): ReservationUI => {
+    // 날짜 형식을 변환 (YYYY-MM-DD -> YY.MM.DD (요일))
+    const formatDate = (dateStr: string): string => {
+      const date = new Date(dateStr);
+      const year = date.getFullYear().toString().slice(-2);
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekday = weekdays[date.getDay()];
+      return `${year}.${month}.${day} (${weekday})`;
+    };
+
+    // 시간 형식을 변환 (HH:MM -> 오전/오후 HH:MM)
+    const formatTime = (timeStr: string): string => {
+      const [hour, minute] = timeStr.split(':');
+      const hourNum = parseInt(hour);
+      if (hourNum < 12) {
+        return `오전 ${hour}:${minute}`;
+      } else if (hourNum === 12) {
+        return `오후 ${hour}:${minute}`;
+      } else {
+        return `오후 ${hourNum - 12}:${minute}`;
+      }
+    };
+
+    return {
+      id: reservation.reservation_id.toString(),
+      clinicName: reservation.hospital_name,
+      location: '서울 종로구', // API에 위치 정보가 없어서 기본값 사용
+      practitioner: reservation.doctor_name,
+      treatment: reservation.symptoms || '진료 상담',
+      visitDate: formatDate(reservation.reservation_date),
+      visitTime: formatTime(reservation.reservation_time),
+      status: reservation.status,
+      canBookAgain: reservation.status === 'COMPLETED',
+      canCancel: reservation.status === 'CONFIRMED',
+      canWriteReview: reservation.status === 'COMPLETED',
+      canViewReview: false, // API에 리뷰 정보가 없어서 기본값 사용
+    };
+  };
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>예약 목록을 불러오는 중...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>
+            예약 목록을 불러오는데 실패했습니다.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // API 데이터를 UI 데이터로 변환
+  const transformedReservations = modifiedReservations.map(
+    transformReservationData
+  );
 
   // 정렬된 예약 목록
-  const sortedReservations = [...MOCK_RESERVATIONS].sort((a, b) => {
+  const sortedReservations = [...transformedReservations].sort((a, b) => {
     // 날짜 문자열을 Date 객체로 변환 (예: "25.08.02" -> 2025-08-02)
     const getDateFromString = (dateStr: string) => {
       const [year, month, day] = dateStr.split('.').map(num => parseInt(num));
@@ -125,11 +161,11 @@ const ReservationList = () => {
 
   const getStatusColor = (status: ReservationStatus) => {
     switch (status) {
-      case '예약 완료':
+      case 'CONFIRMED':
         return '#FF6B35';
-      case '예약 취소':
+      case 'CANCELLED':
         return '#9CA3AF';
-      case '방문 완료':
+      case 'COMPLETED':
         return '#10B981';
       default:
         return '#9CA3AF';
@@ -138,14 +174,30 @@ const ReservationList = () => {
 
   const getStatusBackgroundColor = (status: ReservationStatus) => {
     switch (status) {
-      case '예약 완료':
+      case 'CONFIRMED':
         return '#FFF3F0';
-      case '예약 취소':
+      case 'CANCELLED':
         return '#F3F4F6';
-      case '방문 완료':
+      case 'COMPLETED':
         return '#F0FDF4';
       default:
         return '#F3F4F6';
+    }
+  };
+
+  // 상태를 한글로 변환하는 함수
+  const getStatusText = (status: ReservationStatus): string => {
+    switch (status) {
+      case 'PENDING':
+        return '예약 대기';
+      case 'CONFIRMED':
+        return '예약 완료';
+      case 'CANCELLED':
+        return '예약 취소';
+      case 'COMPLETED':
+        return '방문 완료';
+      default:
+        return '예약 대기';
     }
   };
 
@@ -183,9 +235,7 @@ const ReservationList = () => {
     <SafeAreaView style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>
-          총 예약 {MOCK_RESERVATIONS.length}건
-        </Text>
+        <Text style={styles.headerTitle}>총 예약 {reservations.length}건</Text>
         <TouchableOpacity style={styles.sortButton} onPress={handleSortToggle}>
           <Text style={styles.sortButtonText}>{sortOrder}</Text>
           <Text style={styles.sortIcon}>↕</Text>
@@ -236,7 +286,7 @@ const ReservationList = () => {
                       { color: getStatusColor(reservation.status) },
                     ]}
                   >
-                    {reservation.status}
+                    {getStatusText(reservation.status)}
                   </Text>
                 </View>
               </View>
@@ -403,6 +453,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#374151',
     fontWeight: '500',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F7E2D4',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#374151',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F7E2D4',
+  },
+  errorText: {
+    fontSize: 18,
+    color: '#374151',
   },
 });
 

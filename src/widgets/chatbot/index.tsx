@@ -379,7 +379,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: scale(68),
     right: scale(10),
-    zIndex: 9999,
+    elevation: 9999, // 안드로이드용
+    zIndex: 9999, // iOS용
   },
   buttonContainer: {
     width: scale(60),
@@ -395,6 +396,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 9998, // 안드로이드용
+    zIndex: 9998, // iOS용
   },
   modalContainer: {
     width: '100%',
@@ -408,7 +411,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5,
+    elevation: 9999, // 안드로이드용
+    zIndex: 9999, // iOS용
   },
   modalContent: {
     width: '100%',

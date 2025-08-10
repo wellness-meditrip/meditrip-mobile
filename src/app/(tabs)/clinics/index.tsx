@@ -59,8 +59,6 @@ const Clinics = () => {
         try {
           localStorage.setItem('token', '${authToken}');
           localStorage.setItem('userInfo', '${JSON.stringify(userInfo)}');     
-              
-          
         } catch (error) {
           console.error('Failed to inject auth data:', error);
         }

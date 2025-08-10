@@ -233,6 +233,7 @@ const useProfileData = () => {
     localData,
     updateLocalData,
     handleSave,
+    setUser,
   };
 };
 
@@ -344,11 +345,18 @@ const ProfileSection = ({
 
 const Profile = () => {
   const { user, pickImage, isUpdatingImage } = useProfileImage();
-  const { localData, updateLocalData, handleSave } = useProfileData();
+  const { localData, updateLocalData, handleSave, setUser } = useProfileData();
   const backgroundColor = useThemeColor({}, 'background');
 
   const handleCountrySelect = (countryName: string) => {
     updateLocalData('country', countryName);
+    // UI에 즉시 반영하기 위해 user 상태도 업데이트
+    if (user) {
+      setUser({
+        ...user,
+        country: countryName,
+      });
+    }
   };
 
   const handleLanguageSelect = async (languageName: string) => {

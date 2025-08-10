@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   Platform,
   Modal,
+  FlatList,
 } from 'react-native';
+// @ts-ignore
 import { Picker } from '@react-native-picker/picker';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
@@ -54,7 +56,14 @@ const NativePicker: React.FC<NativePickerProps> = ({
   // 선택된 옵션 찾기
   const selectedOption = options.find(option => option.name === selectedValue);
 
-  // iOS용 모달 피커
+  const handleValueChange = (value: string) => {
+    console.log('NativePicker handleValueChange:', value);
+    if (value && value !== '') {
+      onSelect(value);
+    }
+  };
+
+  // iOS에서는 Modal 안에 Picker 사용 (이전 방식)
   if (Platform.OS === 'ios') {
     return (
       <View style={[styles.container, containerStyle]}>
@@ -142,66 +151,102 @@ const NativePicker: React.FC<NativePickerProps> = ({
     );
   }
 
-  // Android에서는 드롭다운 형태로 표시
+  // Android에서는 커스텀 모달 사용
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
         <Text style={[styles.label, { color: textColor }]}>{label}</Text>
       )}
-      <View style={[styles.pickerContainer, style]}>
-        <TouchableOpacity
+      <TouchableOpacity
+        style={[
+          styles.pickerButton,
+          {
+            backgroundColor: inputBackgroundColor,
+            borderColor: borderColor,
+            opacity: disabled ? 0.6 : 1,
+          },
+          style,
+        ]}
+        onPress={() => !disabled && setIsOpen(true)}
+        disabled={disabled}
+      >
+        <Text
           style={[
-            styles.pickerButton,
-            {
-              backgroundColor: inputBackgroundColor,
-              borderColor: borderColor,
-              opacity: disabled ? 0.6 : 1,
-            },
+            styles.pickerButtonText,
+            { color: selectedValue ? textColor : '#999' },
           ]}
-          onPress={() => setIsOpen(!isOpen)}
-          disabled={disabled}
         >
-          <Text
-            style={[
-              styles.pickerButtonText,
-              { color: selectedValue ? textColor : '#999' },
-            ]}
-          >
-            {selectedOption?.name || placeholder}
-          </Text>
-          <Text style={styles.pickerArrow}>{isOpen ? '▲' : '▼'}</Text>
-        </TouchableOpacity>
+          {selectedOption?.name || placeholder}
+        </Text>
+        <Text style={styles.pickerArrow}>▼</Text>
+      </TouchableOpacity>
 
-        {isOpen && (
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType='slide'
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <View style={styles.modalOverlay}>
           <View
-            style={[
-              styles.pickerList,
-              { backgroundColor: backgroundColor, borderColor: borderColor },
-            ]}
+            style={[styles.modalContent, { backgroundColor: backgroundColor }]}
           >
-            <Picker
-              selectedValue={selectedValue}
-              onValueChange={itemValue => {
-                if (itemValue) {
-                  onSelect(itemValue as string);
-                  setIsOpen(false);
-                }
-              }}
-              style={styles.androidPicker}
-            >
-              <Picker.Item label={placeholder} value='' color='#999' />
-              {options.map(option => (
-                <Picker.Item
-                  key={option.id}
-                  label={option.name}
-                  value={option.name}
-                  color={textColor}
-                />
-              ))}
-            </Picker>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                onPress={() => setIsOpen(false)}
+                style={styles.cancelButton}
+              >
+                <Text style={[styles.cancelButtonText, { color: '#007AFF' }]}>
+                  취소
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsOpen(false)}
+                style={styles.doneButton}
+              >
+                <Text style={[styles.doneButtonText, { color: '#007AFF' }]}>
+                  완료
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <FlatList
+                data={options}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.optionItem,
+                      selectedValue === item.name && styles.selectedOptionItem,
+                    ]}
+                    onPress={() => {
+                      handleValueChange(item.name);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        { color: textColor },
+                        selectedValue === item.name &&
+                          styles.selectedOptionText,
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                    {selectedValue === item.name && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
+                  </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.optionsList}
+              />
+            </View>
           </View>
-        )}
-      </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -214,10 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 8,
-  },
-  pickerContainer: {
-    position: 'relative',
-    zIndex: 1,
   },
   pickerButton: {
     flexDirection: 'row',
@@ -234,28 +275,6 @@ const styles = StyleSheet.create({
   pickerArrow: {
     fontSize: 12,
     color: '#666',
-  },
-  pickerList: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginTop: 2,
-    zIndex: 2,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    maxHeight: 200,
-  },
-  androidPicker: {
-    height: 200,
   },
   modalOverlay: {
     flex: 1,
@@ -287,6 +306,47 @@ const styles = StyleSheet.create({
   doneButtonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  pickerContainer: {
+    padding: 20,
+    maxHeight: 300, // 최대 높이 제한으로 스크롤 가능하게
+  },
+  optionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    minHeight: 56, // 터치 영역 확보
+  },
+  selectedOptionItem: {
+    backgroundColor: '#f0f8ff', // 연한 파란색 배경
+    borderLeftWidth: 4,
+    borderLeftColor: '#007AFF',
+  },
+  optionText: {
+    fontSize: 16,
+    flex: 1, // 텍스트가 공간을 차지하도록
+  },
+  selectedOptionText: {
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  checkmark: {
+    fontSize: 18,
+    color: '#007AFF',
+    fontWeight: 'bold',
+  },
+  optionsList: {
+    paddingBottom: 20,
+  },
+  iosPickerContainer: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    backgroundColor: '#f8f8f8',
   },
   iosPicker: {
     height: 200,
