@@ -22,7 +22,7 @@ export default function AuthHandler() {
             // 성공적으로 사용자 정보를 받았으면 메인 화면으로 이동
             console.log('Authentication successful:', userInfo);
             Alert.alert(
-              '로그인 성공',
+              '로그인이 완료되었습니다.',
               `${userInfo.displayName}님, 환영합니다!`
             );
             router.replace('/(tabs)/home');

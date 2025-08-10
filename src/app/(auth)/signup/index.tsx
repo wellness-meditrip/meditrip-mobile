@@ -10,11 +10,13 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { Icon } from '@/components/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { CountryLanguagePicker } from '@/src/shared/ui/custom';
 import { useSignup } from '@/src/shared/config/api-hooks';
 import { type SignupRequest } from '@/src/shared/config/schemas';
+import { api } from '@/src/shared/config/api-client';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -85,17 +87,6 @@ const Signup = () => {
   };
 
   const handleSignup = async () => {
-    console.log('📝 회원가입 시도 시작');
-    console.log('📧 이메일:', email);
-    console.log('🔑 비밀번호:', password ? '***' : '입력되지 않음');
-    console.log('🔑 비밀번호 확인:', confirmPassword ? '***' : '입력되지 않음');
-    console.log('👤 닉네임:', nickname);
-    console.log('🌍 국가:', country);
-    console.log('🆔 국가 ID:', countryId);
-    console.log('📧 이메일 인증:', isEmailVerified);
-    console.log('📋 약관 동의:', termsAgreement);
-    console.log('📢 마케팅 동의:', marketingAgreement);
-
     // 모든 필수 필드 검증
     if (!email || !isEmailVerified) {
       console.log('❌ 이메일 인증 미완료');
@@ -185,6 +176,19 @@ const Signup = () => {
         console.log('👤 사용자 정보:', result.user);
         console.log('🔑 토큰 정보:', result.tokens);
         console.log('🆕 신규 사용자:', result.is_new_user);
+
+        // 토큰 저장
+        if (result.tokens) {
+          const tokenKeys = Object.keys(result.tokens);
+          if (tokenKeys.length > 0) {
+            const firstToken = result.tokens[tokenKeys[0]];
+            if (typeof firstToken === 'string') {
+              await api.setAuthToken(firstToken);
+              console.log('✅ 회원가입 후 토큰을 저장했습니다');
+            }
+          }
+        }
+
         Alert.alert('성공', result.message || '회원가입이 완료되었습니다.');
         router.push('/(auth)/signup/user-profile');
       } else {
@@ -290,7 +294,11 @@ const Signup = () => {
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Text style={styles.eyeIcon}>👁</Text>
+                <Icon
+                  name={showPassword ? 'ic-eyeoff' : 'ic-eye'}
+                  size={20}
+                  color='#666'
+                />
               </TouchableOpacity>
             </View>
             {password && !isValidPassword(password) && (
@@ -315,7 +323,11 @@ const Signup = () => {
                 style={styles.eyeButton}
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                <Text style={styles.eyeIcon}>👁</Text>
+                <Icon
+                  name={showConfirmPassword ? 'ic-eyeoff' : 'ic-eye'}
+                  size={20}
+                  color='#666'
+                />
               </TouchableOpacity>
             </View>
             {confirmPassword && password !== confirmPassword && (
@@ -524,9 +536,6 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     padding: 12,
-  },
-  eyeIcon: {
-    fontSize: 16,
   },
   errorText: {
     fontSize: 12,

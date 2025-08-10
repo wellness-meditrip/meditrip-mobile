@@ -5,6 +5,7 @@ import ScrollView from './scroll-view';
 import Text from './text';
 import View from './view';
 import { DatePicker } from './date-picker';
+import { SpinnerDatePicker } from './spinner-date-picker';
 import Dropdown from './dropdown';
 import NativePicker from './native-picker';
 import CountryLanguagePicker from './country-language-picker';
@@ -17,6 +18,7 @@ export {
   Text,
   View,
   DatePicker,
+  SpinnerDatePicker,
   Dropdown,
   NativePicker,
   CountryLanguagePicker,

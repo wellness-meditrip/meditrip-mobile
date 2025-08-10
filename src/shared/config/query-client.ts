@@ -54,18 +54,28 @@ export const queryKeys = {
   },
 
   // 예약 관련
-  bookings: {
-    all: ['bookings'] as const,
-    lists: () => [...queryKeys.bookings.all, 'list'] as const,
-    list: (filters: Record<string, any>) =>
-      [...queryKeys.bookings.lists(), filters] as const,
-    details: () => [...queryKeys.bookings.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.bookings.details(), id] as const,
+  reservation: {
+    all: ['reservation'] as const,
+    lists: () => [...queryKeys.reservation.all, 'list'] as const,
+    list: (user_id: number) =>
+      [...queryKeys.reservation.lists(), user_id] as const,
+    details: () => [...queryKeys.reservation.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.reservation.details(), id] as const,
   },
 
   // 챗봇 관련
   chatbot: {
     all: ['chatbot'] as const,
     history: () => [...queryKeys.chatbot.all, 'history'] as const,
+  },
+
+  // 리뷰 관련
+  reviews: {
+    all: ['reviews'] as const,
+    lists: () => [...queryKeys.reviews.all, 'list'] as const,
+    list: (filters?: Record<string, any>) =>
+      [...queryKeys.reviews.lists(), filters] as const,
+    details: () => [...queryKeys.reviews.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.reviews.details(), id] as const,
   },
 } as const;

@@ -10,7 +10,6 @@ import ARROWUPDOWN from '../../assets/icons/ic-arrow-up-down.svg';
 import CALENDAR from '../../assets/icons/ic-calendar.svg';
 import CALL from '../../assets/icons/ic-call.svg';
 import CAMERA from '../../assets/icons/ic-camera.svg';
-import CHATBOT from '../../assets/icons/ic-chatbot.svg';
 import CHECK from '../../assets/icons/ic-check.svg';
 import CHECKBOX from '../../assets/icons/ic-checkbox.svg';
 import CHEVRONDOWN from '../../assets/icons/ic-chevron-down.svg';
@@ -20,7 +19,7 @@ import CHEVRONUP from '../../assets/icons/ic-chevron-up.svg';
 import CLOCK from '../../assets/icons/ic-clock.svg';
 import CLOSE from '../../assets/icons/ic-close.svg';
 import DELETE from '../../assets/icons/ic-delete.svg';
-import DIETDETOX from '../../assets/icons/ic-diet&detox.svg';
+import DIETDETOX from '../../assets/icons/ic-diet-detox.svg';
 import EDIT from '../../assets/icons/ic-edit.svg';
 import ELLIPSISVERTICAL from '../../assets/icons/ic-ellipsis-vertical.svg';
 import ERROR from '../../assets/icons/ic-error.svg';
@@ -48,6 +47,7 @@ import SEND from '../../assets/icons/ic-send.svg';
 import SHARE from '../../assets/icons/ic-share.svg';
 import STARHALF from '../../assets/icons/ic-star-half.svg';
 import STAR from '../../assets/icons/ic-star.svg';
+
 import WIFI from '../../assets/icons/ic-wifi.svg';
 import WOMANHEALTH from '../../assets/icons/ic-woman-health.svg';
 import CLINICLIST from '../../assets/icons/ic-clinic-list.svg';
@@ -61,7 +61,6 @@ export type IconName =
   | 'ic-calendar'
   | 'ic-call'
   | 'ic-camera'
-  | 'ic-chatbot'
   | 'ic-check'
   | 'ic-checkbox'
   | 'ic-chevron-down'
@@ -118,7 +117,6 @@ const iconMap: Record<IconName, React.FC<SvgProps>> = {
   'ic-calendar': CALENDAR,
   'ic-call': CALL,
   'ic-camera': CAMERA,
-  'ic-chatbot': CHATBOT,
   'ic-check': CHECK,
   'ic-checkbox': CHECKBOX,
   'ic-chevron-down': CHEVRONDOWN,
@@ -156,6 +154,7 @@ const iconMap: Record<IconName, React.FC<SvgProps>> = {
   'ic-share': SHARE,
   'ic-star-half': STARHALF,
   'ic-star': STAR,
+
   'ic-wifi': WIFI,
   'ic-woman-health': WOMANHEALTH,
   'ic-clinic-list': CLINICLIST,

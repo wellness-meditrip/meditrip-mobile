@@ -1,6 +1,6 @@
-import { ARROW_LEFT } from '@/assets/icons/components/header';
 import { scale, useSafeRouter } from '@/src/shared/lib';
 import { Button, Text, View } from '@/src/shared/ui/custom';
+import { Icon } from '@/components/icons';
 import { usePathname } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -29,7 +29,7 @@ const Header = ({ title }: HeaderProps) => {
       {!isTopLevelPage && (
         <Button onPress={handleGoBack}>
           <View>
-            <ARROW_LEFT width={scale(24)} height={scale(24)} />
+            <Icon name='ic-chevron-left' size={scale(24)} color='#000000' />
           </View>
         </Button>
       )}

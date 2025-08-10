@@ -6,12 +6,7 @@ import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { ColorPalette } from '@/constants/Colors';
 import Header from '@/src/widgets/header';
-import {
-  HOME,
-  HOME_COLOR,
-  MY_PAGE,
-  MY_PAGE_COLOR,
-} from '@/assets/icons/components';
+
 import Chatbot from '../../widgets/chatbot';
 import { scale } from '../../shared/lib/scale-utils';
 import { Icon } from '../../../components/icons';
@@ -34,11 +29,11 @@ export default function TabLayout() {
           tabBarStyle: Platform.select({
             ios: {
               position: 'relative',
-              height: 68,
+              height: 72,
               paddingTop: 8,
             },
             default: {
-              height: 68,
+              height: 72,
               paddingTop: 8,
             },
           }),
@@ -58,9 +53,11 @@ export default function TabLayout() {
                 }
               />
             ),
-            tabBarLabel: 'Home',
+            tabBarLabel: '홈',
             tabBarLabelStyle: {
               fontSize: scale(12),
+              fontWeight: 'bold',
+              paddingTop: 4,
             },
           }}
         />
@@ -78,15 +75,18 @@ export default function TabLayout() {
                 }
               />
             ),
-            tabBarLabel: 'Clinics',
+            tabBarLabel: '한의원',
             tabBarLabelStyle: {
               fontSize: scale(12),
+              fontWeight: 'bold',
+              paddingTop: 4,
             },
           }}
         />
         <Tabs.Screen
           name='my-page'
           options={{
+            headerShown: false,
             title: 'My Page',
             tabBarIcon: ({ focused }) => (
               <Icon
@@ -97,9 +97,11 @@ export default function TabLayout() {
                 }
               />
             ),
-            tabBarLabel: 'My Page',
+            tabBarLabel: '마이페이지',
             tabBarLabelStyle: {
               fontSize: scale(12),
+              fontWeight: 'bold',
+              paddingTop: 4,
             },
           }}
         />

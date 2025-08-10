@@ -9,10 +9,22 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
+import { Icon } from '../../../components/icons';
 import { router } from 'expo-router';
+import { useAtom } from 'jotai';
 import { signInWithGoogle, signInWithLine } from '../../shared/lib/auth';
 import { useLogin } from '../../shared/config/api-hooks';
 import { type LoginResponse } from '../../shared/config/schemas';
+import { api } from '../../shared/config/api-client';
+import {
+  userAtom,
+  isLoggedInAtom,
+  saveUserToStorage,
+  saveLoginState,
+} from '../../shared/lib/profile-store';
+import { getUserProfileImage } from '../../shared/config';
+import * as FileSystem from 'expo-file-system';
+import { cleanupOldProfileImages } from '../../shared/lib/image-utils';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,6 +34,10 @@ const Login = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [lineLoading, setLineLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
+
+  // Jotai 상태 관리
+  const [, setUser] = useAtom(userAtom);
+  const [, setIsLoggedIn] = useAtom(isLoggedInAtom);
 
   const loginMutation = useLogin();
 
@@ -49,6 +65,28 @@ const Login = () => {
     try {
       const result = await signInWithGoogle();
       if (result.success && result.user) {
+        // Jotai store에 사용자 정보 저장
+        const userData = {
+          id: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          nickname: result.user.displayName,
+          lineId: undefined,
+          country: result.user.country,
+          language: 'KO',
+          isNewUser: false,
+          profileImage: result.user.photoURL,
+        };
+
+        setUser(userData);
+
+        // AsyncStorage에 사용자 정보 저장
+        await saveUserToStorage(userData);
+
+        // 로그인 상태 설정 및 저장
+        setIsLoggedIn(true);
+        await saveLoginState(true);
+
         Alert.alert(
           '성공',
           `${result.user.displayName || result.user.email || '사용자'}님, 환영합니다!\n이메일: ${result.user.email || '이메일 없음'}`
@@ -70,6 +108,27 @@ const Login = () => {
     try {
       const result = await signInWithLine();
       if (result.success && result.user) {
+        // Jotai store에 사용자 정보 저장
+        const userData = {
+          id: result.user.uid,
+          email: undefined,
+          displayName: result.user.displayName,
+          nickname: result.user.displayName,
+          lineId: result.user.uid,
+          country: undefined,
+          language: 'KO',
+          isNewUser: false,
+        };
+
+        setUser(userData);
+
+        // AsyncStorage에 사용자 정보 저장
+        await saveUserToStorage(userData);
+
+        // 로그인 상태 설정 및 저장
+        setIsLoggedIn(true);
+        await saveLoginState(true);
+
         Alert.alert(
           '성공',
           `${result.user.displayName || '사용자'}님, 환영합니다!\n라인 ID: ${result.user.uid || 'ID 없음'}`
@@ -87,45 +146,109 @@ const Login = () => {
   };
 
   const handleEmailLogin = async () => {
-    console.log('🔐 로그인 시도 시작');
-    console.log('📧 이메일:', email);
-    console.log('🔑 비밀번호:', password ? '***' : '입력되지 않음');
-    console.log('💾 로그인 유지:', keepLoggedIn);
-
     if (!email || !password) {
-      console.log('❌ 필수 필드 누락');
-      Alert.alert('오류', '이메일과 비밀번호를 모두 입력해주세요.');
+      Alert.alert('오류', '이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
     if (!isValidEmail(email)) {
-      console.log('❌ 이메일 형식 오류');
       Alert.alert('오류', '올바른 이메일 형식을 입력해주세요.');
       return;
     }
 
     try {
-      console.log('🚀 API 호출 시작');
       const result = await loginMutation.mutateAsync({
         email,
         password,
         remember_me: keepLoggedIn,
       });
 
-      console.log('📡 API 응답:', JSON.stringify(result, null, 2));
-
       if (result.success) {
-        console.log('✅ 로그인 성공');
-        console.log('👤 사용자 정보:', result.user);
-        console.log('🔑 토큰 정보:', result.tokens);
-        console.log('🆕 신규 사용자:', result.is_new_user);
+        // Jotai store에 사용자 정보 저장
+        if (result.user) {
+          // 국가 ID를 국가명으로 변환하는 함수
+          const getCountryName = (countryId: number): string => {
+            switch (countryId) {
+              case 1:
+                return '한국';
+              case 2:
+                return '일본';
+              case 3:
+                return '미국';
+              default:
+                return '한국';
+            }
+          };
+          console.log('result.user', result.user);
+
+          const profileImage = await getUserProfileImage(
+            Number(result.user.id)
+          );
+
+          // base64 이미지를 파일로 저장
+          let profileImagePath: string | undefined = undefined;
+          if (profileImage.data?.image_data) {
+            try {
+              const fileName = `profile_${result.user.id}_${Date.now()}.jpg`;
+              const filePath = `${FileSystem.documentDirectory}${fileName}`;
+
+              await FileSystem.writeAsStringAsync(
+                filePath,
+                profileImage.data.image_data,
+                {
+                  encoding: FileSystem.EncodingType.Base64,
+                }
+              );
+
+              profileImagePath = filePath;
+              console.log('✅ 프로필 이미지를 파일로 저장했습니다:', filePath);
+            } catch (error) {
+              console.error('❌ 프로필 이미지 저장 실패:', error);
+            }
+          }
+
+          const userData = {
+            id: result.user.id,
+            email: result.user.email,
+            displayName:
+              result.user.name ||
+              result.user.display_name ||
+              result.user.displayName,
+            nickname: result.user.nickname,
+            lineId: result.user.line_id || result.user.lineId,
+            country: getCountryName(result.user.country_id),
+            language: result.user.language || 'KO', // 기본값 설정
+            profileImage: profileImagePath, // 파일 경로 저장
+            isNewUser: result.is_new_user,
+          };
+
+          setUser(userData);
+
+          // AsyncStorage에 사용자 정보 저장
+          await saveUserToStorage(userData);
+
+          // 오래된 프로필 이미지 파일 정리
+          await cleanupOldProfileImages(result.user.id.toString());
+        }
+
+        // 토큰 저장 (AsyncStorage에서 관리)
+        if (result.tokens) {
+          const tokenKeys = Object.keys(result.tokens);
+          if (tokenKeys.length > 0) {
+            const firstToken = result.tokens[tokenKeys[0]];
+            if (typeof firstToken === 'string') {
+              await api.setAuthToken(firstToken);
+            }
+          }
+        }
+
+        // 로그인 상태 설정 및 저장
+        setIsLoggedIn(true);
+        await saveLoginState(true);
+
         Alert.alert('성공', result.message || '로그인되었습니다.');
         router.replace('/(tabs)/home');
       } else {
-        console.log('❌ 로그인 실패');
-        console.log('📝 에러 메시지:', result.message);
-        console.log('📝 전체 응답:', JSON.stringify(result, null, 2));
-
         // API 응답에서 에러 메시지를 찾는 로직
         let errorMessage = '로그인에 실패했습니다.';
         if (result.error) {
@@ -137,10 +260,6 @@ const Login = () => {
         Alert.alert('오류', errorMessage);
       }
     } catch (error: any) {
-      console.log('💥 로그인 중 예외 발생');
-      console.log('❌ 에러 객체:', error);
-      console.log('📝 에러 메시지:', error?.message);
-      console.log('🔗 에러 스택:', error?.stack);
       Alert.alert('오류', error?.message || '로그인 중 문제가 발생했습니다.');
     }
   };
@@ -197,7 +316,11 @@ const Login = () => {
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Text style={styles.eyeIcon}>👁</Text>
+                <Icon
+                  name={showPassword ? 'ic-eyeoff' : 'ic-eye'}
+                  size={20}
+                  color='#666'
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -247,14 +370,14 @@ const Login = () => {
           </TouchableOpacity>
 
           {/* 구분선 */}
-          <View style={styles.dividerContainer}>
+          {/* <View style={styles.dividerContainer}>
             <View style={styles.divider} />
             <Text style={styles.dividerText}>Or Continue with</Text>
             <View style={styles.divider} />
-          </View>
+          </View> */}
 
           {/* 소셜 로그인 버튼들 */}
-          <View style={styles.socialButtonsContainer}>
+          {/* <View style={styles.socialButtonsContainer}>
             <TouchableOpacity
               style={[styles.socialButton, styles.googleButton]}
               onPress={handleGoogleLogin}
@@ -278,7 +401,7 @@ const Login = () => {
                 <Text style={styles.lineIcon}>L</Text>
               )}
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.signupSection}>
@@ -360,9 +483,6 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     padding: 12,
-  },
-  eyeIcon: {
-    fontSize: 20,
   },
   optionsContainer: {
     flexDirection: 'row',

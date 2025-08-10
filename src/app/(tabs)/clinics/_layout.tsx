@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 export default function ClinicsLayout() {
   return (
     <Stack
+      initialRouteName='index'
       screenOptions={{
         headerShown: false,
         animation: 'none',

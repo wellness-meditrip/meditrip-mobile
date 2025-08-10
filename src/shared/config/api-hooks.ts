@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, API_ENDPOINTS } from './api-client';
-import { API_CONFIG } from './api';
 import { queryKeys } from './query-client';
 import {
   UserSchema,
@@ -15,9 +14,13 @@ import {
   SignupRequestSchema,
   SignupResponseSchema,
   UpdateProfileRequestSchema,
+  CreateProfileRequestSchema,
+  CreateProfileResponseSchema,
   CreateBookingRequestSchema,
   SendChatMessageRequestSchema,
   ClinicSearchRequestSchema,
+  ReviewListResponseSchema,
+  HospitalListResponseSchema,
   type User,
   type Clinic,
   type Booking,
@@ -27,15 +30,27 @@ import {
   type SignupRequest,
   type SignupResponse,
   type UpdateProfileRequest,
+  type CreateProfileRequest,
+  type CreateProfileResponse,
   type CreateBookingRequest,
   type SendChatMessageRequest,
   type ClinicSearchRequest,
-  CreateProfileRequest,
-  CreateProfileResponse,
-  CreateProfileRequestSchema,
-  CreateProfileResponseSchema,
+  type ReviewListResponse,
+  type HospitalListResponse,
+  type ClinicListResponse,
 } from './schemas';
-import { loginUser, signupUser, createProfile } from './api-function';
+import {
+  loginUser,
+  signupUser,
+  createProfile,
+  getMyReviews,
+  updateUserProfileImage,
+  UpdateUserProfileImageRequest,
+  getClinicList,
+  getUserProfileImage,
+  deleteReview,
+  getReservationList,
+} from './api-function';
 
 // 인증 관련 훅들
 export const useLogin = () => {
@@ -44,7 +59,11 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: async (userData: LoginRequest): Promise<LoginResponse> => {
       const validatedData = LoginRequestSchema.parse(userData);
-      const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, validatedData);
+      const response = await api.post(
+        'AUTH',
+        API_ENDPOINTS.AUTH.LOGIN,
+        validatedData
+      );
 
       // 중첩된 응답 구조 처리
       const actualResponse = response.data || response;
@@ -75,38 +94,29 @@ export const useLogin = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
     },
     onError: error => {
-      console.error('로그인 중 오류 발생:', error);
+      // 로그인 중 오류 발생
     },
   });
 };
 
+// 회원가입 훅
 export const useSignup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (userData: SignupRequest): Promise<SignupResponse> => {
       const validatedData = SignupRequestSchema.parse(userData);
-      const response = await api.post(API_ENDPOINTS.AUTH.SIGNUP, validatedData);
+      const response = await api.post(
+        'AUTH',
+        API_ENDPOINTS.AUTH.SIGNUP,
+        validatedData
+      );
+
+      // 중첩된 응답 구조 처리
+      const actualResponse = response.data || response;
 
       // 응답 데이터 검증
-      const validatedResponse = SignupResponseSchema.parse(response);
-
-      if (validatedResponse.success && validatedResponse.tokens) {
-        // access_token을 우선적으로 찾기
-        if (validatedResponse.tokens.access_token) {
-          await api.setAuthToken(validatedResponse.tokens.access_token);
-        } else {
-          // 기존 로직 (첫 번째 토큰 사용)
-          const tokenKeys = Object.keys(validatedResponse.tokens);
-          if (tokenKeys.length > 0) {
-            const firstTokenKey = tokenKeys[0];
-            const firstToken = validatedResponse.tokens[firstTokenKey];
-            if (typeof firstToken === 'string') {
-              await api.setAuthToken(firstToken);
-            }
-          }
-        }
-      }
+      const validatedResponse = SignupResponseSchema.parse(actualResponse);
 
       return validatedResponse;
     },
@@ -115,11 +125,26 @@ export const useSignup = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
     },
     onError: error => {
-      console.error('회원가입 중 오류 발생:', error);
+      // 회원가입 중 오류 발생
     },
   });
 };
 
+// 사용자 프로필 관련 훅들
+export const useUserProfile = () => {
+  return useQuery({
+    queryKey: queryKeys.auth.profile(),
+    queryFn: async () => {
+      const response = await api.get('USER', API_ENDPOINTS.USER.PROFILE);
+      if (response.success && response.data) {
+        return UserSchema.parse(response.data);
+      }
+      throw new Error(response.error || '사용자 프로필을 불러올 수 없습니다.');
+    },
+  });
+};
+
+// 프로필 생성 훅
 export const useCreateProfile = () => {
   const queryClient = useQueryClient();
 
@@ -127,31 +152,37 @@ export const useCreateProfile = () => {
     mutationFn: async (
       profileData: CreateProfileRequest
     ): Promise<CreateProfileResponse> => {
-      // 토큰 확인
-      const currentToken = await api.loadAuthToken();
-      if (!currentToken) {
-        return {
-          success: false,
-          error: '인증 토큰이 필요합니다. 다시 로그인해주세요.',
-        };
-      }
+      const response = await createProfile(profileData);
+      return response;
+    },
+    onSuccess: () => {
+      // 프로필 생성 성공 시 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
+    },
+  });
+};
 
-      const validatedData = CreateProfileRequestSchema.parse(profileData);
-      const response = await api.post(
-        API_ENDPOINTS.USER.CREATE_PROFILE,
+// 프로필 업데이트 훅
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (profileData: UpdateProfileRequest): Promise<User> => {
+      const validatedData = UpdateProfileRequestSchema.parse(profileData);
+      const response = await api.put(
+        'USER',
+        API_ENDPOINTS.USER.UPDATE_PROFILE,
         validatedData
       );
 
-      // 응답 데이터 검증
-      const validatedResponse = CreateProfileResponseSchema.parse(response);
-      return validatedResponse;
+      if (response.success && response.data) {
+        return UserSchema.parse(response.data);
+      }
+      throw new Error(response.error || '프로필 업데이트에 실패했습니다.');
     },
-    onSuccess: data => {
-      // 성공 시 쿼리 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
-    },
-    onError: error => {
-      console.error('프로필 생성 중 오류 발생:', error);
+    onSuccess: () => {
+      // 프로필 업데이트 성공 시 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
     },
   });
 };
@@ -160,8 +191,12 @@ export const useCreateProfile = () => {
 export const useClinics = (filters?: ClinicSearchRequest) => {
   return useQuery({
     queryKey: queryKeys.clinics.list(filters || {}),
-    queryFn: async () => {
-      const response = await api.get(API_ENDPOINTS.CLINICS.LIST, filters);
+    queryFn: async (): Promise<ClinicListResponse> => {
+      const response = await api.get(
+        'CLINICS',
+        API_ENDPOINTS.CLINICS.LIST,
+        filters
+      );
       if (response.success && response.data) {
         return ClinicListResponseSchema.parse(response.data);
       }
@@ -170,12 +205,13 @@ export const useClinics = (filters?: ClinicSearchRequest) => {
   });
 };
 
+// 클리닉 상세 정보 훅
 export const useClinicDetail = (clinicId: string) => {
   return useQuery({
     queryKey: queryKeys.clinics.detail(clinicId),
     queryFn: async () => {
       const endpoint = API_ENDPOINTS.CLINICS.DETAIL.replace(':id', clinicId);
-      const response = await api.get(endpoint);
+      const response = await api.get('CLINICS', endpoint);
       if (response.success && response.data) {
         return ClinicSchema.parse(response.data);
       }
@@ -185,56 +221,15 @@ export const useClinicDetail = (clinicId: string) => {
   });
 };
 
-// 예약 관련 훅들
-export const useBookings = (filters?: Record<string, any>) => {
-  return useQuery({
-    queryKey: queryKeys.bookings.list(filters || {}),
-    queryFn: async () => {
-      const response = await api.get(API_ENDPOINTS.BOOKINGS.LIST, filters);
-      if (response.success && response.data) {
-        return BookingListResponseSchema.parse(response.data);
-      }
-      throw new Error(response.error || '예약 목록을 불러올 수 없습니다.');
-    },
-  });
-};
-
-export const useCreateBooking = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (bookingData: CreateBookingRequest) => {
-      const validatedData = CreateBookingRequestSchema.parse(bookingData);
-      return await api.post(API_ENDPOINTS.BOOKINGS.CREATE, validatedData);
-    },
-    onSuccess: () => {
-      // 예약 생성 성공 시 예약 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
-    },
-  });
-};
-
-export const useCancelBooking = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (bookingId: string) => {
-      const endpoint = API_ENDPOINTS.BOOKINGS.CANCEL.replace(':id', bookingId);
-      return await api.delete(endpoint);
-    },
-    onSuccess: () => {
-      // 예약 취소 성공 시 예약 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.lists() });
-    },
-  });
-};
-
 // 챗봇 관련 훅들
 export const useChatHistory = () => {
   return useQuery({
     queryKey: queryKeys.chatbot.history(),
     queryFn: async () => {
-      const response = await api.get(API_ENDPOINTS.CHATBOT.GET_HISTORY);
+      const response = await api.get(
+        'CHATBOT',
+        API_ENDPOINTS.CHATBOT.GET_HISTORY
+      );
       if (response.success && response.data) {
         return ChatHistoryResponseSchema.parse(response.data);
       }
@@ -250,6 +245,7 @@ export const useSendChatMessage = () => {
     mutationFn: async ({ question }: SendChatMessageRequest) => {
       const validatedData = SendChatMessageRequestSchema.parse({ question });
       const response = await api.post(
+        'CHATBOT',
         API_ENDPOINTS.CHATBOT.SEND_MESSAGE,
         validatedData
       );
@@ -262,6 +258,97 @@ export const useSendChatMessage = () => {
     onSuccess: () => {
       // 메시지 전송 성공 시 채팅 기록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.chatbot.history() });
+    },
+  });
+};
+
+export const useGetMyReviews = (user_id: number) => {
+  return useQuery({
+    queryKey: queryKeys.reviews.list(),
+    queryFn: async () => {
+      const response = await getMyReviews(user_id);
+      if (response.success && response.data) {
+        // 스키마 검증 없이 직접 반환
+        return response.data;
+      }
+      throw new Error(response.error || '리뷰 목록을 불러올 수 없습니다.');
+    },
+  });
+};
+
+export const useDeleteReview = () => {
+  return useMutation({
+    mutationFn: async (review_id: string) => {
+      const response = await deleteReview(review_id);
+      return response;
+    },
+  });
+};
+
+// 프로필 이미지 업로드 훅
+export const useUpdateProfileImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (imageData: {
+      user_id: number;
+      image_data: string;
+      image_type: string;
+      original_filename: string;
+    }) => {
+      const response = await api.post(
+        'USER',
+        API_ENDPOINTS.USER.UPDATE_PROFILE_IMAGE,
+        imageData
+      );
+
+      // 서버 응답의 success 필드를 확인
+      if (!response.success) {
+        throw new Error(response.error || '이미지 업로드에 실패했습니다.');
+      }
+
+      return response;
+    },
+    onSuccess: () => {
+      // 프로필 이미지 업데이트 성공 시 사용자 프로필 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.profile() });
+    },
+  });
+};
+
+export const useGetProfileImage = (user_id: number) => {
+  return useQuery({
+    queryKey: queryKeys.auth.profile(),
+    queryFn: async () => {
+      const response = await getUserProfileImage(user_id);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error || '프로필 이미지를 불러올 수 없습니다.');
+    },
+  });
+};
+
+export const useGetClinicList = () => {
+  return useQuery({
+    queryKey: queryKeys.clinics.lists(),
+    queryFn: async (): Promise<ClinicListResponse> => {
+      const response = await getClinicList();
+      if (response.success && response.data) {
+        // 스키마 검증을 통해 올바른 데이터 구조 확인
+        return ClinicListResponseSchema.parse(response.data);
+      }
+      throw new Error(response.error || '클리닉 목록을 불러올 수 없습니다.');
+    },
+  });
+};
+
+export const useGetReservationList = (user_id: number) => {
+  return useQuery({
+    queryKey: queryKeys.reservation.lists(),
+    queryFn: async () => {
+      const response = await getReservationList(user_id);
+      return response;
     },
   });
 };

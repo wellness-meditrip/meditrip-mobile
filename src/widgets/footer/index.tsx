@@ -18,15 +18,15 @@ const Footer = () => {
           <View style={{ height: 10 }} />
           <View>
             <Text fontSize={12} color='#666' weight='bold'>
-              MEDITRIP
+              MEDITRIP 2025 © All rights reserved
             </Text>
           </View>
           <View style={{ height: 10 }} />
-          <Text fontSize={12} color='#666'>
-            Pravacy
+          <Text fontSize={12} color='#666' weight='bold'>
+            개인정보처리방침
           </Text>
-          <Text fontSize={12} color='#666'>
-            Terms of Service
+          <Text fontSize={12} color='#666' weight='bold'>
+            이용약관
           </Text>
         </View>
       </View>

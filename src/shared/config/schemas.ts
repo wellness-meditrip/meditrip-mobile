@@ -104,13 +104,21 @@ export const CreateProfileResponseSchema = z.object({
 
 // 클리닉 관련 스키마
 export const ClinicSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
   description: z.string(),
   address: z.string(),
   phone: z.string(),
-  email: z.string().email().optional(),
-  website: z.string().url().optional(),
+  email: z.string().optional(),
+  website: z.string(),
+  line: z.string(),
+  instagram: z.string(),
+  youtube: z.string(),
+  established_date: z.string(),
+  description_jp: z.string(),
+  description_en: z.string(),
+  address_jp: z.string(),
+  address_en: z.string(),
   rating: z.number().min(0).max(5).optional(),
   reviewCount: z.number().optional(),
   images: z.array(z.string()).optional(),
@@ -131,13 +139,7 @@ export const ClinicSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-export const ClinicListResponseSchema = z.object({
-  clinics: z.array(ClinicSchema),
-  total: z.number(),
-  page: z.number(),
-  limit: z.number(),
-  hasNext: z.boolean(),
-});
+// ... existing code ...
 
 export const ClinicSearchRequestSchema = z.object({
   query: z.string().optional(),
@@ -206,6 +208,147 @@ export const ChatHistoryResponseSchema = z.object({
   total: z.number(),
 });
 
+// 리뷰 관련 스키마
+export const ReviewSchema = z.object({
+  review_id: z.number(),
+  hospital_id: z.number(),
+  user_id: z.number(),
+  doctor_id: z.number(),
+  doctor_name: z.string(),
+  title: z.string(),
+  rating: z.number().min(1).max(5),
+  is_verified: z.boolean(),
+  created_at: z.string().datetime(),
+  keyword_count: z.number(),
+  image_count: z.number(),
+  images: z.array(z.string()).optional(), // base64 이미지 배열 추가
+});
+
+// 병원 관련 스키마 (새로운 API 응답 구조)
+export const HospitalOperatingHoursSchema = z.object({
+  day_of_week: z.number(),
+  open_time: z.string().nullable(),
+  close_time: z.string().nullable(),
+  lunch_start: z.string().nullable(),
+  lunch_end: z.string().nullable(),
+  is_closed: z.boolean(),
+  notes: z.string().nullable(),
+});
+
+export const HospitalImageSchema = z.object({
+  image_type: z.string(),
+  image_url: z.string(),
+  alt_text: z.string(),
+  is_main: z.boolean(),
+});
+
+export const HospitalDepartmentSchema = z.object({
+  name: z.string(),
+  name_en: z.string(),
+  name_jp: z.string(),
+  description: z.string(),
+  is_available: z.boolean(),
+});
+
+export const HospitalDetailsSchema = z.object({
+  parking_available: z.boolean(),
+  parking_description: z.string().nullable(),
+  wifi_available: z.boolean(),
+  wifi_description: z.string().nullable(),
+  luggage_storage: z.boolean(),
+  luggage_storage_description: z.string().nullable(),
+  private_treatment: z.boolean(),
+  private_treatment_description: z.string().nullable(),
+  airport_pickup: z.boolean(),
+  airport_pickup_description: z.string().nullable(),
+  translation_service: z.boolean(),
+  translation_description: z.string().nullable(),
+  operating_hours: z.array(HospitalOperatingHoursSchema),
+  images: z.array(HospitalImageSchema),
+  departments: z.array(HospitalDepartmentSchema),
+  id: z.number(),
+  hospital_id: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const HospitalSchema = z.object({
+  hospital_name: z.string(),
+  address: z.string(),
+  contact: z.string(),
+  website: z.string().nullable(),
+  line: z.string().nullable(),
+  instagram: z.string().nullable(),
+  youtube: z.string().nullable(),
+  established_date: z.string(),
+  hospital_description: z.string(),
+  hospital_description_jp: z.string().nullable(),
+  hospital_description_en: z.string().nullable(),
+  hospital_address_jp: z.string().nullable(),
+  hospital_address_en: z.string().nullable(),
+  hospital_id: z.number(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  hospital_details: z.array(HospitalDetailsSchema),
+});
+
+export const HospitalListResponseSchema = z.object({
+  hospitals: z.array(HospitalSchema),
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
+});
+
+// 클리닉 목록 응답 스키마 (병원 데이터 구조와 동일)
+export const ClinicListResponseSchema = z.object({
+  hospitals: z.array(HospitalSchema),
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
+});
+
+export const ReviewListResponseSchema = z.object({
+  items: z.array(ReviewSchema),
+  total: z.number(),
+  limit: z.number(),
+  offset: z.number(),
+  has_next: z.boolean(),
+  has_prev: z.boolean(),
+});
+
+// 예약 관련 스키마
+export const ReservationSchema = z.object({
+  reservation_id: z.number(),
+  hospital_id: z.number(),
+  hospital_name: z.string(),
+  doctor_id: z.number(),
+  doctor_name: z.string(),
+  user_id: z.number(),
+  symptoms: z.string(),
+  reservation_date: z.string(),
+  reservation_time: z.string(),
+  status: z.enum(['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']),
+  contact_email: z.string().email(),
+  contact_phone: z.string(),
+  interpreter_language: z.string(),
+  created_at: z.string(),
+  image_count: z.number(),
+});
+
+export const ReservationListResponseSchema = z.object({
+  items: z.array(ReservationSchema),
+  total: z.number(),
+  limit: z.number(),
+  offset: z.number(),
+  has_next: z.boolean(),
+  has_prev: z.boolean(),
+});
+
+// 예약 목록 API 응답 스키마 (API 응답 래퍼 포함)
+export const ReservationListApiResponseSchema = ApiResponseSchema(
+  ReservationListResponseSchema
+);
+
 // API 응답 타입들
 export type User = z.infer<typeof UserSchema>;
 export type Clinic = z.infer<typeof ClinicSchema>;
@@ -228,3 +371,24 @@ export type ClinicSearchRequest = z.infer<typeof ClinicSearchRequestSchema>;
 export type ClinicListResponse = z.infer<typeof ClinicListResponseSchema>;
 export type BookingListResponse = z.infer<typeof BookingListResponseSchema>;
 export type ChatMessageResponse = z.infer<typeof ChatMessageSchema>;
+export type Review = z.infer<typeof ReviewSchema>;
+export type ReviewListResponse = z.infer<typeof ReviewListResponseSchema>;
+
+// 예약 관련 타입들
+export type Reservation = z.infer<typeof ReservationSchema>;
+export type ReservationListResponse = z.infer<
+  typeof ReservationListResponseSchema
+>;
+export type ReservationListApiResponse = z.infer<
+  typeof ReservationListApiResponseSchema
+>;
+
+// 병원 관련 타입들
+export type HospitalOperatingHours = z.infer<
+  typeof HospitalOperatingHoursSchema
+>;
+export type HospitalImage = z.infer<typeof HospitalImageSchema>;
+export type HospitalDepartment = z.infer<typeof HospitalDepartmentSchema>;
+export type HospitalDetails = z.infer<typeof HospitalDetailsSchema>;
+export type Hospital = z.infer<typeof HospitalSchema>;
+export type HospitalListResponse = z.infer<typeof HospitalListResponseSchema>;

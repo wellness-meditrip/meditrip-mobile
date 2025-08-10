@@ -3,15 +3,7 @@ import { StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { View } from '@/src/shared/ui/custom';
 import { ClinicCard } from './ClinicCard';
 import { scale } from '../lib/scale-utils';
-
-interface Clinic {
-  id: string;
-  name: string;
-  specialty: string;
-  location: string;
-  rating: number;
-  image: any;
-}
+import { Clinic } from '../../app/(tabs)/home';
 
 interface ClinicSliderProps {
   clinics: Clinic[];
@@ -36,7 +28,7 @@ export const ClinicSlider: React.FC<ClinicSliderProps> = ({
           key={clinic.id}
           name={clinic.name}
           specialty={clinic.specialty}
-          location={clinic.location}
+          tags={clinic?.tags || []}
           rating={clinic.rating}
           image={clinic.image}
           onPress={() => onClinicPress?.(clinic)}

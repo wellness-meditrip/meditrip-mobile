@@ -4,6 +4,7 @@ export default function HomeLayout() {
   return (
     <>
       <Stack
+        initialRouteName='index'
         screenOptions={{
           headerShown: false,
           animation: 'none',

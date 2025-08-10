@@ -7,9 +7,9 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 interface ClinicCardProps {
   name: string;
   specialty: string;
-  location: string;
+  tags: string[];
   rating: number;
-  image: any;
+  image: any; // require() 또는 { uri: string }
   onPress?: () => void;
   isLast?: boolean;
 }
@@ -17,7 +17,7 @@ interface ClinicCardProps {
 export const ClinicCard: React.FC<ClinicCardProps> = ({
   name,
   specialty,
-  location,
+  tags,
   rating,
   image,
   onPress,
@@ -50,16 +50,6 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
       <View style={styles.badgeContainer}>
         <View
           style={{
-            ...styles.locationBadge,
-            backgroundColor: badgeBackgroundColor,
-          }}
-        >
-          <Text style={{ ...styles.locationText, color: badgeTextColor }}>
-            {location}
-          </Text>
-        </View>
-        <View
-          style={{
             ...styles.ratingBadge,
             backgroundColor: badgeBackgroundColor,
           }}
@@ -71,7 +61,13 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
       </View>
       <View style={styles.overlay}>
         <Text style={styles.clinicName}>{name}</Text>
-        <Text style={styles.specialty}>{specialty}</Text>
+        <View style={styles.tagsContainer}>
+          {tags?.map(tag => (
+            <Text key={tag} style={styles.tag}>
+              {tag}
+            </Text>
+          ))}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -108,18 +104,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    maxWidth: 120,
   },
   locationText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+    lineHeight: 14,
   },
   ratingBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
   ratingText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
   },
   overlay: {
@@ -140,5 +139,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     opacity: 0.9,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  tag: {
+    color: 'white',
+    fontSize: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
 });

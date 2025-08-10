@@ -25,6 +25,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const [tempSelectedDate, setTempSelectedDate] = useState<string | undefined>(
     selectedDate
   );
+  console.log(selectedDate);
 
   // 다크모드 색상 적용
   const backgroundColor = useThemeColor({}, 'background');

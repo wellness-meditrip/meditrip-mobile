@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
-import { DatePicker } from '@/src/shared/ui/custom';
+import { SpinnerDatePicker } from '@/src/shared/ui/custom';
 import { useCreateProfile } from '@/src/shared/config/api-hooks';
 
 const UserProfile = () => {
@@ -83,6 +83,8 @@ const UserProfile = () => {
         weight: weightNumber || undefined,
         topics_of_interest: selectedHealthTopics,
       };
+
+      console.log('profileData', profileData);
 
       const result = await createProfileMutation.mutateAsync(profileData);
 
@@ -231,7 +233,7 @@ const UserProfile = () => {
             {/* 생년월일 입력 */}
             <View style={styles.subSection}>
               <Text style={styles.subSectionLabel}>생년월일</Text>
-              <DatePicker
+              <SpinnerDatePicker
                 placeholder='날짜를 선택해주세요'
                 selectedDate={birthDate}
                 onChange={setBirthDate}

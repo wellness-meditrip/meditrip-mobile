@@ -6,38 +6,52 @@ import axios, {
   isCancel,
 } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_CONFIG, API_ENDPOINTS, ApiResponse, ApiError } from './api';
+import {
+  API_CONFIG,
+  API_ENDPOINTS,
+  SERVICE_URLS,
+  ApiResponse,
+  ApiError,
+} from './api';
 
 // API 클라이언트 클래스
 class ApiClient {
-  private axiosInstance: AxiosInstance;
+  private axiosInstances: Map<string, AxiosInstance> = new Map();
   private cancelTokens: Map<string, CancelTokenSource> = new Map();
 
   constructor() {
-    this.axiosInstance = axios.create({
-      baseURL: API_CONFIG.BASE_URL,
-      headers: API_CONFIG.HEADERS,
-      timeout: 10000, // 10초 타임아웃
-    });
+    // 서비스별 axios 인스턴스 생성
+    this.createAxiosInstances();
+  }
 
-    this.setupInterceptors();
+  // 서비스별 axios 인스턴스 생성
+  private createAxiosInstances() {
+    Object.entries(SERVICE_URLS).forEach(([service, baseURL]) => {
+      const instance = axios.create({
+        baseURL,
+        headers: API_CONFIG.HEADERS,
+        timeout: API_CONFIG.TIMEOUT,
+      });
+
+      this.setupInterceptors(instance, service);
+      this.axiosInstances.set(service, instance);
+    });
+  }
+
+  // 서비스에 맞는 axios 인스턴스 가져오기
+  private getAxiosInstance(service: string): AxiosInstance {
+    const instance = this.axiosInstances.get(service);
+    if (!instance) {
+      throw new Error(`Unknown service: ${service}`);
+    }
+    return instance;
   }
 
   // 인터셉터 설정
-  private setupInterceptors() {
+  private setupInterceptors(instance: AxiosInstance, service: string) {
     // 요청 인터셉터
-    this.axiosInstance.interceptors.request.use(
+    instance.interceptors.request.use(
       config => {
-        // 요청 로깅 (개발 환경에서만)
-        if (__DEV__) {
-          console.log(
-            '🚀 API Request:',
-            config.method?.toUpperCase(),
-            config.url
-          );
-          console.log('📤 요청 헤더:', config.headers);
-          console.log('📤 요청 데이터:', config.data);
-        }
         return config;
       },
       error => {
@@ -46,31 +60,11 @@ class ApiClient {
     );
 
     // 응답 인터셉터
-    this.axiosInstance.interceptors.response.use(
+    instance.interceptors.response.use(
       response => {
-        // 응답 로깅 (개발 환경에서만)
-        if (__DEV__) {
-          console.log('✅ API Response:', response.status, response.config.url);
-          console.log('📡 응답 헤더:', response.headers);
-          console.log('📡 응답 데이터:', response.data);
-        }
         return response;
       },
       error => {
-        // 에러 로깅 (개발 환경에서만)
-        if (__DEV__) {
-          console.log(
-            '❌ API Error:',
-            error.response?.status,
-            error.config?.url
-          );
-          console.log('❌ 에러 응답:', error.response?.data);
-          console.log('❌ 에러 메시지:', error.message);
-          console.log('❌ 요청 URL:', error.config?.url);
-          console.log('❌ 요청 메서드:', error.config?.method);
-          console.log('❌ 요청 데이터:', error.config?.data);
-        }
-
         // 401 에러 처리 (토큰 만료)
         if (error.response?.status === 401) {
           // 토큰 갱신 로직을 여기에 추가할 수 있습니다
@@ -82,57 +76,67 @@ class ApiClient {
     );
   }
 
-  // 토큰 설정
+  // 토큰 설정 (모든 인스턴스에 적용)
   async setAuthToken(token: string) {
-    // 헤더에 토큰 설정
-    this.axiosInstance.defaults.headers.common['Authorization'] =
-      `Bearer ${token}`;
+    // 모든 axios 인스턴스에 토큰 설정
+    this.axiosInstances.forEach(instance => {
+      instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    });
 
     // AsyncStorage에 토큰 저장
     try {
       await AsyncStorage.setItem('auth_token', token);
     } catch (error) {
-      console.error('❌ 토큰 저장 실패:', error);
+      // 토큰 저장 실패 처리
     }
   }
 
-  // 토큰 제거
+  // 토큰 제거 (모든 인스턴스에서 제거)
   async removeAuthToken() {
-    // 헤더에서 토큰 제거
-    delete this.axiosInstance.defaults.headers.common['Authorization'];
+    // 모든 axios 인스턴스에서 토큰 제거
+    this.axiosInstances.forEach(instance => {
+      delete instance.defaults.headers.common['Authorization'];
+    });
 
     // AsyncStorage에서 토큰 제거
     try {
       await AsyncStorage.removeItem('auth_token');
     } catch (error) {
-      console.error('❌ 토큰 제거 실패:', error);
+      // 토큰 제거 실패 처리
     }
   }
 
-  // 저장된 토큰 불러오기
+  // 토큰 로드 (모든 인스턴스에 적용)
   async loadAuthToken(): Promise<string | null> {
     try {
       const token = await AsyncStorage.getItem('auth_token');
-
       if (token) {
-        // 헤더에 토큰 설정
-        this.axiosInstance.defaults.headers.common['Authorization'] =
-          `Bearer ${token}`;
-        return token;
+        // 모든 axios 인스턴스에 토큰 설정
+        this.axiosInstances.forEach(instance => {
+          instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        });
       }
-      return null;
+      return token;
     } catch (error) {
-      console.error('❌ 토큰 불러오기 실패:', error);
       return null;
     }
   }
 
-  // 헤더 설정
+  // 토큰 가져오기 (AsyncStorage에서만 가져오기, 헤더 설정 안함)
+  async getAuthToken(): Promise<string | null> {
+    try {
+      const token = await AsyncStorage.getItem('auth_token');
+      return token;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // 헤더 설정 (모든 인스턴스에 적용)
   setHeaders(headers: Record<string, string>) {
-    this.axiosInstance.defaults.headers.common = {
-      ...this.axiosInstance.defaults.headers.common,
-      ...headers,
-    };
+    this.axiosInstances.forEach(instance => {
+      Object.assign(instance.defaults.headers, headers);
+    });
   }
 
   // 요청 취소 토큰 생성
@@ -176,15 +180,17 @@ class ApiClient {
 
   // GET 요청
   async get<T = any>(
+    service: string,
     endpoint: string,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
+    const instance = this.getAxiosInstance(service);
     const requestId = this.generateRequestId(endpoint, params);
     const cancelToken = this.createCancelToken(requestId);
 
     try {
-      const response = await this.axiosInstance.get<T>(endpoint, {
+      const response = await instance.get<T>(endpoint, {
         params,
         cancelToken: cancelToken.token,
         ...config,
@@ -203,16 +209,18 @@ class ApiClient {
 
   // POST 요청
   async post<T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
+    const instance = this.getAxiosInstance(service);
     const requestId = this.generateRequestId(endpoint, params);
     const cancelToken = this.createCancelToken(requestId);
 
     try {
-      const response = await this.axiosInstance.post<T>(endpoint, data, {
+      const response = await instance.post<T>(endpoint, data, {
         params,
         cancelToken: cancelToken.token,
         ...config,
@@ -231,16 +239,18 @@ class ApiClient {
 
   // PUT 요청
   async put<T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
+    const instance = this.getAxiosInstance(service);
     const requestId = this.generateRequestId(endpoint, params);
     const cancelToken = this.createCancelToken(requestId);
 
     try {
-      const response = await this.axiosInstance.put<T>(endpoint, data, {
+      const response = await instance.put<T>(endpoint, data, {
         params,
         cancelToken: cancelToken.token,
         ...config,
@@ -259,15 +269,17 @@ class ApiClient {
 
   // DELETE 요청
   async delete<T = any>(
+    service: string,
     endpoint: string,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
+    const instance = this.getAxiosInstance(service);
     const requestId = this.generateRequestId(endpoint, params);
     const cancelToken = this.createCancelToken(requestId);
 
     try {
-      const response = await this.axiosInstance.delete<T>(endpoint, {
+      const response = await instance.delete<T>(endpoint, {
         params,
         cancelToken: cancelToken.token,
         ...config,
@@ -286,16 +298,18 @@ class ApiClient {
 
   // PATCH 요청 추가
   async patch<T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
+    const instance = this.getAxiosInstance(service);
     const requestId = this.generateRequestId(endpoint, params);
     const cancelToken = this.createCancelToken(requestId);
 
     try {
-      const response = await this.axiosInstance.patch<T>(endpoint, data, {
+      const response = await instance.patch<T>(endpoint, data, {
         params,
         cancelToken: cancelToken.token,
         ...config,
@@ -352,41 +366,47 @@ export const apiClient = new ApiClient();
 // 편의 함수들
 export const api = {
   get: <T = any>(
+    service: string,
     endpoint: string,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
-  ) => apiClient.get<T>(endpoint, params, config),
+  ) => apiClient.get<T>(service, endpoint, params, config),
 
   post: <T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
-  ) => apiClient.post<T>(endpoint, data, params, config),
+  ) => apiClient.post<T>(service, endpoint, data, params, config),
 
   put: <T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
-  ) => apiClient.put<T>(endpoint, data, params, config),
+  ) => apiClient.put<T>(service, endpoint, data, params, config),
 
   patch: <T = any>(
+    service: string,
     endpoint: string,
     data?: any,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
-  ) => apiClient.patch<T>(endpoint, data, params, config),
+  ) => apiClient.patch<T>(service, endpoint, data, params, config),
 
   delete: <T = any>(
+    service: string,
     endpoint: string,
     params?: Record<string, any>,
     config?: AxiosRequestConfig
-  ) => apiClient.delete<T>(endpoint, params, config),
+  ) => apiClient.delete<T>(service, endpoint, params, config),
 
   setAuthToken: (token: string) => apiClient.setAuthToken(token),
   removeAuthToken: () => apiClient.removeAuthToken(),
   loadAuthToken: () => apiClient.loadAuthToken(),
+  getAuthToken: () => apiClient.getAuthToken(),
   setHeaders: (headers: Record<string, string>) =>
     apiClient.setHeaders(headers),
   cancelRequest: (requestId: string) => apiClient.cancelRequest(requestId),
