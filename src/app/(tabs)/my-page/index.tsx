@@ -140,7 +140,7 @@ const ReservationSection = ({
   safeRouter: SafeRouterHandler;
 }) => {
   // const [user] = useAtom(userAtom);
-  const { data, isLoading, error } = useGetReservationList(0);
+  const { data, isLoading, error } = useGetReservationList(1);
 
   // API 데이터를 UI용으로 변환하는 함수
   const transformReservationData = (apiReservation: {
@@ -273,7 +273,7 @@ const ReservationSection = ({
 
 const ReviewSection = ({ safeRouter }: { safeRouter: SafeRouterHandler }) => {
   const [user] = useAtom(userAtom);
-  const { data, isLoading, error } = useGetMyReviews(0);
+  const { data, isLoading, error } = useGetMyReviews(1);
 
   // API 데이터를 UI용으로 변환하는 함수
   const transformReviewData = (apiReview: {

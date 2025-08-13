@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   Modal,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { apiClient } from '../config/api-client';
@@ -27,76 +28,85 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
   const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
   const webViewRef = useRef<WebView>(null);
 
+  // 데이터 로드
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        // 토큰 가져오기
-        const token = await apiClient.getAuthToken();
-        setAuthToken(token);
-        // 사용자 정보 가져오기
-        const userProfile = await loadUserFromStorage();
-        setUserInfo(userProfile);
-      } catch (error) {
-        console.error('데이터 로드 실패:', error);
-      }
-    };
+    if (visible) {
+      const loadData = async () => {
+        try {
+          const token = await apiClient.getAuthToken();
+          setAuthToken(token);
+          const userProfile = await loadUserFromStorage();
+          setUserInfo(userProfile);
+        } catch (error) {
+          console.error('데이터 로드 실패:', error);
+        }
+      };
+      loadData();
+    }
+  }, [visible]);
 
-    loadData();
-  }, []);
-
-  const injectAuthData = () => {
-    if (authToken && userInfo && isWebViewLoaded && visible) {
+  // 인증 데이터 주입
+  const injectAuthData = useCallback(() => {
+    if (authToken && userInfo && isWebViewLoaded && webViewRef.current) {
       const script = `
         try {
           localStorage.setItem('token', '${authToken}');
-          localStorage.setItem('userInfo', '${JSON.stringify(userInfo)}');  
+          localStorage.setItem('userInfo', '${JSON.stringify(userInfo)}');
           console.log('Auth data injected successfully');
-          
         } catch (error) {
           console.error('Failed to inject auth data:', error);
         }
       `;
-      webViewRef.current?.injectJavaScript(script);
-    }
-  };
 
+      try {
+        webViewRef.current.injectJavaScript(script);
+      } catch (error) {
+        console.error('JavaScript injection failed:', error);
+      }
+    }
+  }, [authToken, userInfo, isWebViewLoaded]);
+
+  // 웹뷰 로드 완료 시 인증 데이터 주입
   useEffect(() => {
     if (isWebViewLoaded) {
-      // 웹뷰가 로드된 후 약간의 지연을 두고 인증 데이터 주입
-      const timer = setTimeout(() => {
-        injectAuthData();
-      }, 1000);
-
+      const timer = setTimeout(injectAuthData, 500);
       return () => clearTimeout(timer);
     }
-  }, [authToken, userInfo, isWebViewLoaded, visible]);
+  }, [isWebViewLoaded, injectAuthData]);
 
-  const handleWebViewError = (syntheticEvent: any) => {
-    const { nativeEvent } = syntheticEvent;
-    console.error('WebView error:', nativeEvent);
-  };
-
-  const handleWebViewLoadStart = () => {
+  // 웹뷰 이벤트 핸들러
+  const handleWebViewLoadStart = useCallback(() => {
     console.log('WebView load started');
-  };
+  }, []);
 
-  const handleWebViewLoadEnd = () => {
+  const handleWebViewLoadEnd = useCallback(() => {
     console.log('WebView load completed');
     setIsWebViewLoaded(true);
-  };
+  }, []);
+
+  const handleWebViewError = useCallback((syntheticEvent: any) => {
+    const { nativeEvent } = syntheticEvent;
+    console.error('WebView error:', nativeEvent);
+  }, []);
+
+  // 모달 닫기 시 상태 초기화
+  const handleClose = useCallback(() => {
+    setIsWebViewLoaded(false);
+    onClose();
+  }, [onClose]);
 
   return (
     <Modal
       visible={visible}
       animationType='slide'
       presentationStyle='pageSheet'
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <SafeAreaView style={styles.container}>
         {/* 헤더 */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>리뷰 작성</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Text style={styles.closeButtonText}>닫기</Text>
           </TouchableOpacity>
         </View>
@@ -114,19 +124,13 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             cacheEnabled={true}
-            cacheMode='LOAD_DEFAULT'
-            allowsBackForwardNavigationGestures={true}
-            incognito={false}
-            pullToRefreshEnabled={true}
-            allowsLinkPreview={false}
-            mediaPlaybackRequiresUserAction={false}
             onLoadStart={handleWebViewLoadStart}
             onLoadEnd={handleWebViewLoadEnd}
             onError={handleWebViewError}
-            onHttpError={syntheticEvent => {
-              const { nativeEvent } = syntheticEvent;
-              console.error('WebView HTTP error:', nativeEvent);
-            }}
+            // iOS 최적화
+            {...(Platform.OS === 'ios' && {
+              allowsInlineMediaPlayback: true,
+            })}
           />
         </View>
       </SafeAreaView>

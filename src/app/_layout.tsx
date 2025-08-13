@@ -9,7 +9,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import * as WebBrowser from 'expo-web-browser';
+
 import 'react-native-reanimated';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider, useAtom } from 'jotai';
@@ -24,9 +24,6 @@ import {
   userAtom,
   isLoggedInAtom,
 } from '../shared/lib/profile-store';
-
-// 앱 시작 시 인증 세션 정리
-WebBrowser.maybeCompleteAuthSession();
 
 // 스플래시 화면이 자동으로 숨겨지지 않도록 방지
 SplashScreen.preventAutoHideAsync();

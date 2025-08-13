@@ -1,6 +1,2 @@
-declare module '@env' {
-  export const LINE_CHANNEL_ID: string;
-  export const LINE_CHANNEL_SECRET: string;
-  export const GOOGLE_CLIENT_ID: string;
-  export const GOOGLE_CLIENT_SECRET: string;
-} 
+// 환경변수 타입 정의
+// OAuth 관련 설정이 제거되었습니다. 

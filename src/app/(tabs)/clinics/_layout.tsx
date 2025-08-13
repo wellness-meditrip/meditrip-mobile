@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import Header from '../../../widgets/header';
 
 export default function ClinicsLayout() {
   return (
@@ -12,17 +13,19 @@ export default function ClinicsLayout() {
       <Stack.Screen
         name='index'
         options={{
-          headerShown: false,
+          headerShown: true,
+          header: () => <Header title='한의원' />,
           title: 'Clinics',
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name='clinic-list'
         options={{
-          headerShown: false,
+          headerShown: true,
+          header: () => <Header title='클리닉 리스트' />,
           title: '클리닉 리스트',
         }}
-      />
+      /> */}
     </Stack>
   );
 }

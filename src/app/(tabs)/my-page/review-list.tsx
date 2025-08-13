@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   Modal,
+  Alert,
 } from 'react-native';
 import { useSafeRouter } from '@/src/shared/lib/safe-router';
 import { BoxLayout } from '@/src/shared/ui/box-layout';
@@ -322,7 +323,7 @@ const ReviewList = () => {
   const [reviews, setReviews] = useState<ReviewSchema[]>([]);
   const [user] = useAtom(userAtom);
   // TODO: 유저 아이디 추가
-  const { data, isLoading, error } = useGetMyReviews(0);
+  const { data, isLoading, error } = useGetMyReviews(1);
 
   const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
   const [optionModal, setOptionModal] = useState(false);
@@ -360,12 +361,19 @@ const ReviewList = () => {
   const keyExtractor = (item: ReviewSchema) => item.id;
 
   const handleDeleteReview = async (reviewId: string) => {
-    await deleteReview(reviewId);
-    setDeleteReviewId(null);
-    setOptionModal(false);
-    setReviews(prevReviews =>
-      prevReviews.filter(review => review.id !== reviewId)
-    );
+    try {
+      await deleteReview(reviewId);
+      setDeleteReviewId(null);
+      setOptionModal(false);
+      setReviews(prevReviews =>
+        prevReviews.filter(review => review.id !== reviewId)
+      );
+      // 삭제 성공 알림
+      Alert.alert('삭제 완료', '삭제가 완료되었습니다.');
+    } catch (error) {
+      // 삭제 실패 시 에러 알림
+      Alert.alert('오류', '삭제 중 문제가 발생했습니다.');
+    }
   };
 
   // API 데이터가 로드되면 이미지 처리

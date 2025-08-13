@@ -41,7 +41,7 @@ const ReservationList = () => {
     string | null
   >(null);
   const { isReviewWrite } = useLocalSearchParams();
-  const { data, isLoading, error } = useGetReservationList(0);
+  const { data, isLoading, error } = useGetReservationList(1);
 
   // API에서 받아온 예약 데이터
   const reservations = data?.data?.items || [];
@@ -235,11 +235,20 @@ const ReservationList = () => {
     <SafeAreaView style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>총 예약 {reservations.length}건</Text>
-        <TouchableOpacity style={styles.sortButton} onPress={handleSortToggle}>
-          <Text style={styles.sortButtonText}>{sortOrder}</Text>
-          <Text style={styles.sortIcon}>↕</Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {isReviewWrite
+            ? `작성할 수 있는 리뷰 ${transformedReservations.filter(item => item.canWriteReview).length}건`
+            : `총 예약 ${reservations.length}건`}
+        </Text>
+        {!isReviewWrite && (
+          <TouchableOpacity
+            style={styles.sortButton}
+            onPress={handleSortToggle}
+          >
+            <Text style={styles.sortButtonText}>{sortOrder}</Text>
+            <Text style={styles.sortIcon}>↕</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* 예약 목록 */}
